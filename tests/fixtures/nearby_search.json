@@ -1,0 +1,116 @@
+{
+  "summary": {
+    "queryType": "NEARBY",
+    "queryTime": 52,
+    "numResults": 4,
+    "offset": 0,
+    "totalResults": 4,
+    "fuzzyLevel": 1,
+    "geoBias": {"lat": 45.1, "lon": 4.2}
+  },
+  "results": [
+    {
+      "type": "POI",
+      "id": "poi-example-park-a",
+      "score": 99.66,
+      "dist": 120.5,
+      "info": "search:ev:00000000-0000-4000-8000-000000000001",
+      "poi": {
+        "name": "Example Recharge",
+        "brands": [{"name": "Example Recharge"}],
+        "categorySet": [{"id": 7309}],
+        "categories": ["electric vehicle station"],
+        "classifications": [{"code": "ELECTRIC_VEHICLE_STATION", "names": [{"nameLocale": "en-US", "name": "electric vehicle station"}]}]
+      },
+      "address": {"streetNumber": "1", "streetName": "Example Street", "municipality": "Exampleville", "postalCode": "00000", "countryCode": "FR", "country": "France", "freeformAddress": "1 Example Street, 00000 Exampleville"},
+      "position": {"lat": 45.1, "lon": 4.2},
+      "viewport": {"topLeftPoint": {"lat": 45.10090, "lon": 4.19864}, "btmRightPoint": {"lat": 45.09910, "lon": 4.20136}},
+      "vehicleTypes": ["Car", "Truck"],
+      "chargingPark": {
+        "connectors": [
+          {"connectorType": "IEC62196Type2Outlet", "ratedPowerKW": 22, "voltageV": 230, "currentA": 32, "currentType": "AC3"},
+          {"connectorType": "IEC62196Type2Outlet", "ratedPowerKW": 22, "voltageV": 230, "currentA": 32, "currentType": "AC3"},
+          {"connectorType": "IEC62196Type2Outlet", "ratedPowerKW": 22, "voltageV": 230, "currentA": 32, "currentType": "AC3"},
+          {"connectorType": "StandardHouseholdCountrySpecific", "ratedPowerKW": 2, "voltageV": 230, "currentA": 10, "currentType": "AC1"}
+        ]
+      },
+      "dataSources": {"chargingAvailability": {"id": "00000000-0000-4000-8000-000000000001"}}
+    },
+    {
+      "type": "POI",
+      "id": "poi-example-park-a-duplicate",
+      "score": 99.65,
+      "dist": 131.2,
+      "info": "search:ev:00000000-0000-4000-8000-000000000002",
+      "poi": {
+        "name": "Example Recharge",
+        "phone": "+33 0 00 00 00 00",
+        "brands": [{"name": "Example Recharge"}],
+        "categorySet": [{"id": 7309}],
+        "url": "https://charging.example.org/",
+        "categories": ["electric vehicle station"],
+        "classifications": [{"code": "ELECTRIC_VEHICLE_STATION", "names": [{"nameLocale": "en-US", "name": "electric vehicle station"}]}]
+      },
+      "address": {"streetNumber": "1", "streetName": "Example Street", "municipality": "Exampleville", "postalCode": "00000", "countryCode": "FR", "country": "France", "freeformAddress": "1 Example Street, 00000 Exampleville"},
+      "position": {"lat": 45.1001, "lon": 4.20005},
+      "viewport": {"topLeftPoint": {"lat": 45.10100, "lon": 4.19869}, "btmRightPoint": {"lat": 45.09920, "lon": 4.20141}},
+      "vehicleTypes": ["Car", "Truck"],
+      "chargingPark": {
+        "connectors": [
+          {"connectorType": "IEC62196Type2Outlet", "ratedPowerKW": 22, "voltageV": 400, "currentA": 32, "currentType": "AC3"},
+          {"connectorType": "IEC62196Type2Outlet", "ratedPowerKW": 22, "voltageV": 400, "currentA": 32, "currentType": "AC3"}
+        ]
+      }
+    },
+    {
+      "type": "POI",
+      "id": "poi-example-fast",
+      "score": 99.2,
+      "dist": 2650.0,
+      "info": "search:ev:00000000-0000-4000-8000-000000000003",
+      "poi": {
+        "name": "Example Fast Charge",
+        "brands": [{"name": "Example Fast Charge"}],
+        "categorySet": [{"id": 7309}],
+        "categories": ["electric vehicle station"],
+        "classifications": [{"code": "ELECTRIC_VEHICLE_STATION", "names": [{"nameLocale": "en-US", "name": "electric vehicle station"}]}]
+      },
+      "address": {"streetName": "Example Motorway Services", "municipality": "Exampleville", "postalCode": "00000", "countryCode": "FR", "country": "France", "freeformAddress": "Example Motorway Services, 00000 Exampleville"},
+      "position": {"lat": 45.12, "lon": 4.22},
+      "viewport": {"topLeftPoint": {"lat": 45.12090, "lon": 4.21864}, "btmRightPoint": {"lat": 45.11910, "lon": 4.22136}},
+      "vehicleTypes": ["Car", "Truck"],
+      "chargingPark": {
+        "connectors": [
+          {"connectorType": "IEC62196Type2CCS", "ratedPowerKW": 150, "voltageV": 920, "currentA": 200, "currentType": "DC"},
+          {"connectorType": "IEC62196Type2CCS", "ratedPowerKW": 150, "voltageV": 920, "currentA": 200, "currentType": "DC"},
+          {"connectorType": "Chademo", "ratedPowerKW": 50, "voltageV": 500, "currentA": 125, "currentType": "DC"}
+        ]
+      },
+      "dataSources": {"chargingAvailability": {"id": "00000000-0000-4000-8000-000000000003"}}
+    },
+    {
+      "type": "POI",
+      "id": "poi-example-slow",
+      "score": 99.0,
+      "dist": 910.1,
+      "info": "search:ev:00000000-0000-4000-8000-000000000004",
+      "poi": {
+        "name": "Example Slow",
+        "brands": [{"name": "Example Slow"}],
+        "categorySet": [{"id": 7309}],
+        "categories": ["electric vehicle station"],
+        "classifications": [{"code": "ELECTRIC_VEHICLE_STATION", "names": [{"nameLocale": "en-US", "name": "electric vehicle station"}]}]
+      },
+      "address": {"streetNumber": "71", "streetName": "Example Avenue", "municipality": "Exampleville", "postalCode": "00000", "countryCode": "FR", "country": "France", "freeformAddress": "71 Example Avenue, 00000 Exampleville"},
+      "position": {"lat": 45.092, "lon": 4.203},
+      "viewport": {"topLeftPoint": {"lat": 45.09290, "lon": 4.20164}, "btmRightPoint": {"lat": 45.09110, "lon": 4.20436}},
+      "vehicleTypes": ["Car", "Truck"],
+      "chargingPark": {
+        "connectors": [
+          {"connectorType": "IEC62196Type2Outlet", "ratedPowerKW": 7, "voltageV": 230, "currentA": 32, "currentType": "AC3"}
+        ]
+      },
+      "dataSources": {"chargingAvailability": {"id": "00000000-0000-4000-8000-000000000004"}}
+    }
+  ]
+}

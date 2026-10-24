@@ -34,7 +34,9 @@ Scripts jetables dans `spikes/` ; seules les conclusions sont versionnées.
 
 ## 3. Client TomTom
 
-- Module `api.py` asynchrone : `nearby_search`, `along_route_search`, `charging_availability`.
+> **Fait le 2026-10-24**, sauf la recherche le long d'un itinéraire (attend la question 6 du spike). Voir `FONCTIONNEMENT.md` et `CHANGELOG.md`. Décision de l'utilisateur (2026-10-24) : avancer sur ce chantier avant le mini-spike Android Auto (HA indisponible ce jour-là).
+
+- Module `api.py` asynchrone : `nearby_search`, `along_route_search` *(reste à faire)*, `charging_availability`.
 - Agrégation des connecteurs par (type, puissance) dès l'ingestion ; dédoublonnage des stations par position (~20-30 m) en gardant celle qui a un identifiant de disponibilité.
 - Gestion du 429 (quota atteint) : état explicite, pas de nouvelle tentative en boucle.
 - Validation de la clé dans le config flow (un appel peu coûteux).

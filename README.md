@@ -4,7 +4,7 @@
 
 Home Assistant integration that finds **available EV charging stations** around your car while you drive, and surfaces them on **Android Auto** through the Home Assistant companion app.
 
-> ⚠️ **Status: pre-alpha.** The repository currently contains the integration skeleton only (setup flow storing your API key). Nothing is fetched or displayed yet. See [docs/WIP.md](docs/WIP.md) for the roadmap.
+> ⚠️ **Status: pre-alpha.** The setup flow validates your API key and the TomTom client is in place, but no entity is created yet: nothing is displayed. See [docs/WIP.md](docs/WIP.md) for the roadmap.
 
 ## How it will work
 

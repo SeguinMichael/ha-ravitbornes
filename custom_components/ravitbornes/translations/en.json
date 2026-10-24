@@ -12,6 +12,11 @@
         }
       }
     },
+    "error": {
+      "invalid_auth": "TomTom rejected this API key.",
+      "quota_exceeded": "The TomTom quota or rate limit is reached. Try again later.",
+      "cannot_connect": "Cannot reach TomTom. Check the connection and try again."
+    },
     "abort": {
       "single_instance_allowed": "RavitBornes is already configured."
     }

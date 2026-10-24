@@ -4,7 +4,7 @@
 
 Intégration Home Assistant qui repère les **bornes de recharge disponibles** autour de la voiture pendant le trajet, et les affiche dans **Android Auto** via le companion app Home Assistant.
 
-> ⚠️ **État : pré-alpha.** Le dépôt ne contient pour l'instant que le squelette de l'intégration (configuration qui enregistre la clé API). Rien n'est encore récupéré ni affiché. Feuille de route : [docs/WIP.md](docs/WIP.md).
+> ⚠️ **État : pré-alpha.** La configuration valide la clé API et le client TomTom est en place, mais aucune entité n'est encore créée : rien n'est affiché. Feuille de route : [docs/WIP.md](docs/WIP.md).
 
 ## Fonctionnement prévu
 
