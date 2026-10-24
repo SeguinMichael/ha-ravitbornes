@@ -1,0 +1,5 @@
+# Copier en .config.sh (non versionné) et renseigner.
+# Utilisé par docs/push_to_trilium.sh.
+TRILIUM_URL="https://trilium.example.org"
+TRILIUM_TOKEN="change-me"
+TRILIUM_LANDING_NOTE_ID="change-me"

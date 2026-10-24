@@ -1,0 +1,19 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Clé API TomTom",
+        "description": "RavitBornes utilise votre propre clé API TomTom pour rechercher les bornes de recharge et leur disponibilité. Créez une clé gratuite sur my.tomtom.com.",
+        "data": {
+          "api_key": "Clé API"
+        },
+        "data_description": {
+          "api_key": "Stockée uniquement dans Home Assistant, jamais journalisée."
+        }
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "RavitBornes est déjà configuré."
+    }
+  }
+}

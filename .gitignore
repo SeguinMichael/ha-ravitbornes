@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+.ruff_cache/
+
+# Secrets and local config — never commit
+.env
+.env.*
+!.env.example
+.config.sh
+
+# Throwaway spike scripts (only conclusions go to docs/)
+spikes/
+
+# Editors / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store

@@ -1,0 +1,51 @@
+name: Security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 4 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  secrets:
+    # Fails if a secret (API key, token…) is found anywhere in the git history.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  sast:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+      - run: pip install bandit
+      - run: bandit -r custom_components -ll
+
+  dependencies:
+    # Audits the integration's runtime requirements (manifest.json).
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+      - run: pip install pip-audit
+      - run: jq -r '.requirements[]' custom_components/ravitbornes/manifest.json > runtime-requirements.txt
+      - name: pip-audit
+        run: |
+          if [ -s runtime-requirements.txt ]; then
+            pip-audit -r runtime-requirements.txt
+          else
+            echo "No runtime requirements declared in manifest.json"
+          fi

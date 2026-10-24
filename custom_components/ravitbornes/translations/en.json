@@ -1,0 +1,19 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "TomTom API key",
+        "description": "RavitBornes uses your own TomTom API key to look up charging stations and their availability. Create a free key at my.tomtom.com.",
+        "data": {
+          "api_key": "API key"
+        },
+        "data_description": {
+          "api_key": "Stored in Home Assistant only, never logged."
+        }
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "RavitBornes is already configured."
+    }
+  }
+}

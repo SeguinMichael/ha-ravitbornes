@@ -1,0 +1,13 @@
+{
+  "domain": "ravitbornes",
+  "name": "RavitBornes",
+  "codeowners": ["@SeguinMichael"],
+  "config_flow": true,
+  "documentation": "https://github.com/SeguinMichael/ha-ravitbornes",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/SeguinMichael/ha-ravitbornes/issues",
+  "requirements": [],
+  "single_config_entry": true,
+  "version": "0.0.1"
+}

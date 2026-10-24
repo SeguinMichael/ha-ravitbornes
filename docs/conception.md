@@ -1,0 +1,69 @@
+# Conception
+
+> Fiche de référence des choix d'architecture. Décisions datées ; à lire pour tout chantier qui touche au score, au cache ou à l'affichage.
+
+## Cache (décision 2026-10-24)
+
+Contexte : cas d'usage = **voyage en voiture** ; on repasse rarement dans la même zone, un cache partagé entre trajets n'apporte presque rien. Source unique en v1 : TomTom.
+
+- **Liste des bornes du trajet** : chargée au départ le long du corridor, conservée **le temps du voyage** (quelques heures).
+- **Disponibilité** : TTL **~3 min par borne** (rythme de rafraîchissement annoncé par TomTom). Entre deux rafraîchissements, les rayons de recherche successifs se recouvrent largement (≈ 6,5 km parcourus en 3 min à 130 km/h pour un rayon de 5 km) : le TTL évite de réinterroger les mêmes bornes.
+- **Stockage** : en mémoire. Pas de cache long (durée autorisée par les CGU TomTom non précisée).
+- **Redis : reporté, pas abandonné.** Il se justifie avec plusieurs sources, une collecte asynchrone et une lecture synchrone depuis HA. Règle conservée pour ce cas : pas d'historique, sauf repli sur le dernier prix connu.
+
+## Entrée et vie privée (décision 2026-10-24)
+
+- Entrée = **position GPS (lat/lon)** lue depuis une entité HA ; jamais d'adresse, donc pas de géocodage.
+- Avant tout appel externe, la position est **arrondie** (tuile / geohash) : le fournisseur reçoit une zone (minimisation des données).
+- Les appels partent du serveur HA, jamais du téléphone.
+- La position exacte ne sert qu'au calcul local de distance et au tri.
+
+## Configuration véhicule (saisie une fois)
+
+- **Puissance max de charge** : seul paramètre véhicule qui change le classement en v1.
+- **Connecteurs compatibles** : évite de proposer une borne physiquement incompatible (CCS Combo dans la grande majorité des cas).
+- Capacité batterie et consommation : volontairement exclues (redeviendraient utiles en v2 pour un temps de charge).
+
+## Profils de recharge = presets complets
+
+Deux situations aux fonctions de coût opposées. En itinérance, le temps de charge est du temps perdu → la puissance domine. En visite, on charge pendant qu'on fait autre chose → le prix reprend tout le poids.
+
+| | Autoroute | Visite |
+|---|---|---|
+| Connecteurs | DC uniquement | AC accepté |
+| Puissance mini | ≥ 50 kW | pas de plancher |
+| Rayon / détour max | ~5 km sur le corridor | ~2 km autour de la destination |
+| Fonction de score | minutes perdues | €/kWh |
+
+Deux presets en dur en v1, surchargeables plus tard. La puissance minimale n'est pas un réglage propre : elle découle du profil.
+
+## Score
+
+- **v1** : distance à vol d'oiseau + puissance + disponibilité ; bornes `outOfService` écartées.
+- **v2** : temps d'accès réel en minutes (Matrix Routing, un appel pour les 10-15 meilleurs candidats). Sur autoroute, métrique cible = **temps total perdu = détour + temps de charge** : passer de 50 à 180 kW fait gagner 20-30 min, un détour de 5 min pèse peu à côté. Tout exprimer en minutes fait entrer la puissance dans le score sans pondération arbitraire.
+
+## Tarifs — limite assumée
+
+TomTom ne fournit pas de tarifs en libre-service. Le champ tarif de l'IRVE est mal renseigné et le prix réel dépend du contrat eMSP (badge, roaming, abonnement). Objectif : « dispo fiable + tarif approximatif ». Badge / pass eMSP écarté de la configuration.
+
+## Exposition dans la voiture (décision 2026-10-24)
+
+Voie retenue : **companion app HA dans Android Auto**. D'après sa documentation (non testé, voir mini-spike dans `WIP.md`) :
+
+- notifications avec `car_ui: true` affichées sur l'écran de la voiture → déclencheur ;
+- capteurs affichables en favoris → liste (états textuels, sans mise en forme) ;
+- navigation vers les entités `sensor` / `device_tracker` / `zone` / `person` **porteuses d'une position** → exposer les meilleures bornes comme capteurs avec `latitude` / `longitude` ;
+- limites : nombre d'entités plafonné par le véhicule, pas de mise en forme, l'app HA doit rester visible dans le lanceur Android Auto pour les notifications `car_ui`, HA doit être joignable en mobilité.
+
+### Modèle d'interaction
+
+1. **Notification voiture** = déclencheur. Texte court, silencieuse par défaut, alerte seulement sur opportunité réelle.
+2. **Liste comparative** : 6 éléments maximum en roulant, triés en amont. Une ligne = titre + 2 lignes de texte. Format cible : « **Ionity Exemple** — 150 kW · 8 km · 3/6 libres · 0,39 €/kWh ».
+3. **Choix d'une borne → navigation**, puis retour à l'application de guidage.
+
+### Pour mémoire : app Android Auto dédiée (reportée)
+
+- App Android obligatoire (Kotlin, `androidx.car.app:app-projected`, catégorie POI), test via DHU.
+- Templates imposés, pas d'UI libre ; pas de multi-fenêtre (une app POI passe en plein écran et masque la navigation, qui continue en fond).
+- Publication Play Store soumise aux *Driver Distraction Guidelines* ; sideload possible en mode développeur.
+- Navigation : `Intent(CarContext.ACTION_NAVIGATE, Uri.parse("geo:0,0?q=lat,lon(Nom)"))` ouvre l'app de navigation par défaut ; un lien `waze://` est inopérant depuis le contexte voiture.
