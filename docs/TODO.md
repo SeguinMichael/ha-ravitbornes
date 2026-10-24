@@ -2,6 +2,7 @@
 
 ## Questions ouvertes
 
+- **Rendu « grisé » dans Android Auto** : le companion app HA n'offre pas de mise en forme des favoris ; à déterminer au mini-spike (texte d'état, icône, ou autre). Le statut `unavailable` est déjà calculé (`scoring.py`).
 - **Notification voiture** : déclenchée par l'intégration elle-même, ou par un *blueprint* d'automatisation fourni à côté ? (à trancher après le mini-spike Android Auto)
 - **Quota de l'API de disponibilité TomTom** : non communiqué pour l'offre d'évaluation ; la journalisation des appels donnera la consommation réelle (décision 2026-10-24 : on avance sans le connaître).
 - **Durée de cache autorisée par les CGU TomTom** : non précisée publiquement ; cache court retenu. À confirmer auprès du support si un cache long devient utile.

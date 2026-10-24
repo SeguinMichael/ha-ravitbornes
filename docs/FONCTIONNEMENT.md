@@ -26,6 +26,13 @@ L'intégration se configure et sait interroger TomTom, mais n'expose encore **au
 - `dedupe_stations` : deux résultats à moins de 25 m sont la même station ; on garde celui qui a un identifiant de disponibilité.
 - `parse_availability` : compteurs libre / occupé / réservé / inconnu / hors service, par type de connecteur et niveau de puissance.
 
+### Filtrage et classement (`scoring.py`)
+
+- Deux profils en dur : **autoroute** (DC uniquement, ≥ 50 kW, rayon 5 km) et **visite** (AC accepté, pas de plancher, rayon 2 km).
+- `rank_stations` garde les bornes qui ont au moins un connecteur compatible avec le véhicule et le profil, dans le rayon, puis les **trie par distance** (position exacte utilisée localement uniquement) ; 6 au maximum.
+- Statut par borne, calculé sur les **prises compatibles seulement** : `available` (au moins une libre), `unavailable` (aucune libre : à afficher grisé, la borne garde son rang), `unknown` (pas de donnée de disponibilité).
+- Non encore appelé : sera branché par le coordinateur (chantier 4).
+
 ### Chargement (`__init__.py`)
 
 - N'instancie rien pour l'instant ; aucune entité.
@@ -35,5 +42,6 @@ L'intégration se configure et sait interroger TomTom, mais n'expose encore **au
 - `tests/fixtures/` : réponses TomTom réelles, structure conservée, contenu anonymisé.
 - `test_models.py` : agrégation, DC, absence de disponibilité, dédoublonnage, disponibilité.
 - `test_api.py` : arrondi de la position, mapping des erreurs HTTP, timeout, **absence de la clé dans les logs et les erreurs**.
+- `test_scoring.py` : filtre par profil, tri par distance, borne grisée gardée à son rang, prise incompatible non comptée, disponibilité inconnue, limite.
 - `test_config_flow.py` : création avec validation, erreurs, instance unique.
 - `test_init.py` : chargement et déchargement.

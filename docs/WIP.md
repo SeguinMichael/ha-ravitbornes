@@ -52,6 +52,6 @@ Scripts jetables dans `spikes/` ; seules les conclusions sont versionnées.
 
 ## 5. Score et entités
 
-- Configuration véhicule : puissance max de charge, connecteurs compatibles ; profil par défaut (autoroute / visite). Voir `conception.md`.
-- Score v1 : distance à vol d'oiseau + puissance + disponibilité ; bornes hors service écartées.
+- Configuration véhicule : connecteurs compatibles ; profil par défaut (autoroute / visite). Voir `conception.md`.
+- ~~Score v1~~ **fait le 2026-10-24** (`scoring.py`) : tri par distance, profil en filtre, borne sans prise compatible libre grisée (décision utilisateur du 2026-10-24, voir `conception.md`).
 - Entités : N capteurs « borne 1…N » (état textuel court, attributs `latitude` / `longitude`, puissance, dispo), N ≤ 6.

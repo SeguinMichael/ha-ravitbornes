@@ -39,7 +39,12 @@ Deux presets en dur en v1, surchargeables plus tard. La puissance minimale n'est
 
 ## Score
 
-- **v1** : distance à vol d'oiseau + puissance + disponibilité ; bornes `outOfService` écartées.
+- **v1 — décision de l'utilisateur (2026-10-24)** : tri **par distance à vol d'oiseau uniquement**, pour les deux profils. Pas de note pondérée.
+  - Le profil agit comme **filtre** : connecteurs compatibles avec le véhicule, DC uniquement (autoroute), puissance minimale, rayon maximal.
+  - **Aucune prise compatible libre** (toutes occupées, réservées ou hors service) → la borne reste à son rang de distance, **ligne grisée**. Remplace la règle antérieure « bornes `outOfService` écartées ».
+  - Choix d'implémentation (2026-10-24, modifiables) : seules les prises **compatibles** comptent (une prise domestique libre ne rend pas disponible une borne pour une voiture Type 2) ; **pas de donnée de disponibilité** → statut « inconnu », ligne **non** grisée ; 6 bornes maximum.
+  - Conséquence : la puissance max du véhicule ne change plus le classement en v1.
+  - À vérifier sur données réelles (spike Q2) : la disponibilité est rapprochée des connecteurs par (type, puissance) ; un écart de libellé entre la recherche et la disponibilité donnerait « inconnu ».
 - **v2** : temps d'accès réel en minutes (Matrix Routing, un appel pour les 10-15 meilleurs candidats). Sur autoroute, métrique cible = **temps total perdu = détour + temps de charge** : passer de 50 à 180 kW fait gagner 20-30 min, un détour de 5 min pèse peu à côté. Tout exprimer en minutes fait entrer la puissance dans le score sans pondération arbitraire.
 
 ## Tarifs — limite assumée
@@ -58,7 +63,7 @@ Voie retenue : **companion app HA dans Android Auto**. D'après sa documentation
 ### Modèle d'interaction
 
 1. **Notification voiture** = déclencheur. Texte court, silencieuse par défaut, alerte seulement sur opportunité réelle.
-2. **Liste comparative** : 6 éléments maximum en roulant, triés en amont. Une ligne = titre + 2 lignes de texte. Format cible : « **Ionity Exemple** — 150 kW · 8 km · 3/6 libres · 0,39 €/kWh ».
+2. **Liste comparative** : 6 éléments maximum en roulant, triés en amont (par distance en v1 ; borne sans prise compatible libre **grisée**). Une ligne = titre + 2 lignes de texte. Format cible : « **Ionity Exemple** — 150 kW · 8 km · 3/6 libres · 0,39 €/kWh ».
 3. **Choix d'une borne → navigation**, puis retour à l'application de guidage.
 
 ### Pour mémoire : app Android Auto dédiée (reportée)
