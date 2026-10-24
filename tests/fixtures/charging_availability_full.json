@@ -1,0 +1,1 @@
+{"chargingAvailability":"00000000-0000-4000-8000-000000000004","connectors":[{"type":"IEC62196Type2Outlet","total":1,"availability":{"current":{"available":0,"occupied":1,"reserved":0,"unknown":0,"outOfService":0},"perPowerLevel":[{"powerKW":7.0,"available":0,"occupied":1,"reserved":0,"unknown":0,"outOfService":0}]}}]}

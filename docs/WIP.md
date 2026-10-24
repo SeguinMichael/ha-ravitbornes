@@ -45,13 +45,24 @@ Scripts jetables dans `spikes/` ; seules les conclusions sont versionnées.
 
 ## 4. Position, cache et coordinateur
 
+> **Fait le 2026-10-24**, en autonomie (l'utilisateur a demandé d'« avancer au maximum sans lui »). Choix pris seul : voir `conception.md`, section « Choix pris en autonomie », **à valider**.
+
 - Choix de l'entité de position dans le config flow (`device_tracker` / `person`).
 - Arrondi de la position avant appel externe ; test qui le garantit.
-- Liste des bornes du trajet conservée le temps du voyage ; disponibilité en TTL ~3 min par borne.
+- Liste des bornes conservée 6 h par zone ; disponibilité en TTL ~3 min par borne. *(Le chargement du corridor complet au départ attend la question 6 du spike.)*
 - `DataUpdateCoordinator` déclenché par le déplacement, pas de polling hors trajet.
 
 ## 5. Score et entités
 
+> **Fait le 2026-10-24** (score : décision utilisateur ; config véhicule, capteurs et diagnostics : en autonomie, à valider). Reste : rendu réel dans Android Auto (mini-spike).
+
 - Configuration véhicule : connecteurs compatibles ; profil par défaut (autoroute / visite). Voir `conception.md`.
-- ~~Score v1~~ **fait le 2026-10-24** (`scoring.py`) : tri par distance, profil en filtre, borne sans prise compatible libre grisée (décision utilisateur du 2026-10-24, voir `conception.md`).
-- Entités : N capteurs « borne 1…N » (état textuel court, attributs `latitude` / `longitude`, puissance, dispo), N ≤ 6.
+- Score v1 (`scoring.py`) : tri par distance, profil en filtre, borne sans prise compatible libre grisée.
+- Entités : 6 capteurs « Borne 1…6 » (état textuel court, attributs `latitude` / `longitude`, puissance, dispo).
+
+## 6. Prochaines étapes (ordre proposé)
+
+1. **Installer** l'intégration sur une instance HA réelle (HACS, dépôt personnalisé) et vérifier configuration, capteurs, journaux — premier test hors CI.
+2. **Mini-spike Android Auto** (chantier 1) sur les vrais capteurs : favoris, navigation vers `latitude` / `longitude`, lisibilité du texte, rendu de « complet ».
+3. Recaler les choix pris en autonomie (seuils, défauts) selon ces essais.
+4. Spike TomTom Q2 à Q6, puis recherche le long d'un itinéraire.

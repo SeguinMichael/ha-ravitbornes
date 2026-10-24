@@ -10,6 +10,10 @@
 - **Icône / brand** de l'intégration pour HA et HACS.
 - **Durcissement CI** : épingler les actions GitHub par SHA plutôt que par tag ; activer côté GitHub le *secret scanning* et la *push protection* (gratuits sur dépôt public).
 
+- **Ré-authentification** : si TomTom refuse la clé en cours d'usage, les capteurs deviennent indisponibles sans proposer de ressaisir la clé (flux `reauth` à ajouter).
+- **Détection du trajet** : le capteur « Android Auto connecté » du companion app pourrait servir de déclencheur (rafraîchir aussi à l'arrêt, en voiture) plutôt que le seul déplacement.
+- **Zones denses** : 50 résultats de recherche peuvent ne pas couvrir tout le rayon ; à mesurer (spike Q2).
+
 ## Évolutions envisagées
 
 - **Tarifs** : croisement avec le fichier consolidé IRVE (data.gouv.fr) par coordonnées GPS ; précision approximative assumée (le prix réel dépend du contrat eMSP). TomTom ne fournit pas de tarifs en libre-service.

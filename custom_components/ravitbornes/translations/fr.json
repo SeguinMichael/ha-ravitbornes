@@ -10,15 +10,78 @@
         "data_description": {
           "api_key": "Stockée uniquement dans Home Assistant, jamais journalisée."
         }
+      },
+      "settings": {
+        "title": "Véhicule et position",
+        "description": "Choisissez d'où vient la position de la voiture et quels connecteurs elle accepte.",
+        "data": {
+          "position_entity": "Entité de position",
+          "connectors": "Connecteurs compatibles",
+          "profile": "Profil de recharge"
+        },
+        "data_description": {
+          "position_entity": "Device tracker ou personne du companion app Home Assistant. Aucune recherche n'est faite tant qu'elle est à la maison.",
+          "connectors": "Seules les bornes ayant au moins un de ces connecteurs sont affichées.",
+          "profile": "Autoroute : recharge rapide DC près de la route. Visite : toute borne proche de l'endroit où vous vous arrêtez."
+        }
       }
     },
     "error": {
       "invalid_auth": "TomTom a refusé cette clé API.",
       "quota_exceeded": "Le quota ou la limite de débit TomTom est atteint. Réessayez plus tard.",
-      "cannot_connect": "Impossible de joindre TomTom. Vérifiez la connexion et réessayez."
+      "cannot_connect": "Impossible de joindre TomTom. Vérifiez la connexion et réessayez.",
+      "no_connector": "Sélectionnez au moins un connecteur."
     },
     "abort": {
       "single_instance_allowed": "RavitBornes est déjà configuré."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Véhicule et position",
+        "description": "Choisissez d'où vient la position de la voiture et quels connecteurs elle accepte.",
+        "data": {
+          "position_entity": "Entité de position",
+          "connectors": "Connecteurs compatibles",
+          "profile": "Profil de recharge"
+        },
+        "data_description": {
+          "position_entity": "Device tracker ou personne du companion app Home Assistant. Aucune recherche n'est faite tant qu'elle est à la maison.",
+          "connectors": "Seules les bornes ayant au moins un de ces connecteurs sont affichées.",
+          "profile": "Autoroute : recharge rapide DC près de la route. Visite : toute borne proche de l'endroit où vous vous arrêtez."
+        }
+      }
+    },
+    "error": {
+      "no_connector": "Sélectionnez au moins un connecteur."
+    }
+  },
+  "selector": {
+    "connectors": {
+      "options": {
+        "ccs2": "CCS Combo 2 (DC)",
+        "type2_outlet": "Prise Type 2",
+        "type2_cable": "Câble Type 2 attaché",
+        "chademo": "CHAdeMO (DC)",
+        "type1": "Type 1",
+        "ccs1": "CCS Combo 1 (DC)",
+        "tesla": "Tesla",
+        "household": "Prise domestique"
+      }
+    },
+    "profile": {
+      "options": {
+        "highway": "Autoroute (DC, 50 kW ou plus, à moins de 5 km)",
+        "visit": "Visite (toute puissance, à moins de 2 km)"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "station": {
+        "name": "Borne {index}"
+      }
     }
   }
 }

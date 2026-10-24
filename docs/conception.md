@@ -6,10 +6,30 @@
 
 Contexte : cas d'usage = **voyage en voiture** ; on repasse rarement dans la même zone, un cache partagé entre trajets n'apporte presque rien. Source unique en v1 : TomTom.
 
-- **Liste des bornes du trajet** : chargée au départ le long du corridor, conservée **le temps du voyage** (quelques heures).
+- **Liste des bornes du trajet** : chargée au départ le long du corridor, conservée **le temps du voyage** (quelques heures). *Implémentation actuelle (2026-10-24) : par zone traversée, faute de recherche le long d'un itinéraire ; voir « Choix pris en autonomie ».*
 - **Disponibilité** : TTL **~3 min par borne** (rythme de rafraîchissement annoncé par TomTom). Entre deux rafraîchissements, les rayons de recherche successifs se recouvrent largement (≈ 6,5 km parcourus en 3 min à 130 km/h pour un rayon de 5 km) : le TTL évite de réinterroger les mêmes bornes.
 - **Stockage** : en mémoire. Pas de cache long (durée autorisée par les CGU TomTom non précisée).
 - **Redis : reporté, pas abandonné.** Il se justifie avec plusieurs sources, une collecte asynchrone et une lecture synchrone depuis HA. Règle conservée pour ce cas : pas d'historique, sauf repli sur le dernier prix connu.
+
+## Choix pris en autonomie (2026-10-24) — à valider
+
+Pris par Claude pendant que l'utilisateur était absent (« avance au maximum sans moi »). Chacun est une constante ou un défaut, facile à changer.
+
+| Sujet | Choix | Où |
+|---|---|---|
+| Configuration | 2ᵉ étape du config flow + options modifiables : entité de position, connecteurs, profil | `config_flow.py` |
+| Défauts | Connecteurs CCS Combo 2 + prise Type 2 + câble Type 2 ; profil autoroute | `const.py` |
+| Déclenchement | Sur changement de position uniquement (pas de minuterie), si déplacement ≥ 200 m ; anti-rebond 1 min | `coordinator.py` |
+| Domicile | État `home` : aucun appel, liste vidée | `coordinator.py` |
+| Liste des bornes | Par zone arrondie (~1 km) et profil, 6 h ; rayon de recherche = rayon du profil + 1 km ; 50 résultats max | `coordinator.py` |
+| Disponibilité | Seulement pour les 6 bornes affichées ; 3 min | `coordinator.py` |
+| Quota / réseau | Résultats partiels (« inconnu ») + avertissement ; clé refusée → capteurs indisponibles | `coordinator.py` |
+| Capteurs | 6 « Borne N » ; état `Nom · kW · km · x/y libres` ; grisé = « complet » en texte (provisoire) ; attributs lat/lon de la borne | `sensor.py`, `display.py` |
+| Langue des états | Français si HA est en français, sinon anglais | `display.py` |
+| Diagnostics | Clé et entité de position masquées, aucune coordonnée | `diagnostics.py` |
+| Puissance du véhicule | Non demandée (inutile avec le tri par distance) | — |
+
+Limites connues : pas de flux de ré-authentification ; à l'arrêt (pas de déplacement), la disponibilité n'est plus rafraîchie ; en zone très dense, 50 résultats peuvent ne pas couvrir tout le rayon.
 
 ## Entrée et vie privée (décision 2026-10-24)
 
@@ -20,7 +40,7 @@ Contexte : cas d'usage = **voyage en voiture** ; on repasse rarement dans la mê
 
 ## Configuration véhicule (saisie une fois)
 
-- **Puissance max de charge** : seul paramètre véhicule qui change le classement en v1.
+- ~~**Puissance max de charge** : seul paramètre véhicule qui change le classement en v1.~~ Depuis le tri par distance (2026-10-24), elle ne change plus rien en v1 : **non demandée** (redeviendra utile en v2, temps de charge).
 - **Connecteurs compatibles** : évite de proposer une borne physiquement incompatible (CCS Combo dans la grande majorité des cas).
 - Capacité batterie et consommation : volontairement exclues (redeviendraient utiles en v2 pour un temps de charge).
 

@@ -37,6 +37,7 @@ class ChargingProfile:
 
 HIGHWAY = ChargingProfile("highway", dc_only=True, min_power_kw=50.0, max_distance_m=5000.0)
 VISIT = ChargingProfile("visit", dc_only=False, min_power_kw=0.0, max_distance_m=2000.0)
+PROFILES = {profile.key: profile for profile in (HIGHWAY, VISIT)}
 
 
 @dataclass(frozen=True, slots=True)

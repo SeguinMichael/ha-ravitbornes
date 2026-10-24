@@ -1,4 +1,4 @@
-"""Tests for the RavitBornes config flow."""
+"""Tests for the RavitBornes config and options flows."""
 
 import pytest
 
@@ -10,16 +10,26 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 from pytest_homeassistant_custom_component.test_util.aiohttp import AiohttpClientMocker
 
 from custom_components.ravitbornes.api import BASE_URL
-from custom_components.ravitbornes.const import DOMAIN
+from custom_components.ravitbornes.const import (
+    CONF_CONNECTORS,
+    CONF_POSITION_ENTITY,
+    CONF_PROFILE,
+    DOMAIN,
+)
 
 FAKE_KEY = "test-api-key-not-real"
 NEARBY_URL = f"{BASE_URL}/nearbySearch/.json"
+SETTINGS = {
+    CONF_POSITION_ENTITY: "device_tracker.test_phone",
+    CONF_CONNECTORS: ["ccs2", "type2_outlet"],
+    CONF_PROFILE: "highway",
+}
 
 
 async def test_user_flow_creates_entry(
     hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
 ) -> None:
-    """The user step shows a form, validates the key, then stores it."""
+    """Key step (validated), then settings step; key in data, settings in options."""
     aioclient_mock.get(NEARBY_URL, json={"summary": {}, "results": []})
 
     result = await hass.config_entries.flow.async_init(
@@ -31,10 +41,15 @@ async def test_user_flow_creates_entry(
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"], {CONF_API_KEY: FAKE_KEY}
     )
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "settings"
+    assert aioclient_mock.call_count == 1
+
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], SETTINGS)
     assert result["type"] is FlowResultType.CREATE_ENTRY
     assert result["title"] == "RavitBornes"
     assert result["data"] == {CONF_API_KEY: FAKE_KEY}
-    assert aioclient_mock.call_count == 1
+    assert result["options"] == SETTINGS
 
 
 @pytest.mark.parametrize(
@@ -60,6 +75,25 @@ async def test_user_flow_errors(
     assert result["errors"] == {"base": error}
 
 
+async def test_settings_need_a_connector(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+) -> None:
+    """Without any connector nothing could ever match: refused."""
+    aioclient_mock.get(NEARBY_URL, json={"summary": {}, "results": []})
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN, context={"source": config_entries.SOURCE_USER}
+    )
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_API_KEY: FAKE_KEY}
+    )
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {**SETTINGS, CONF_CONNECTORS: []}
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_CONNECTORS: "no_connector"}
+
+
 async def test_single_instance(hass: HomeAssistant) -> None:
     """A second setup is refused."""
     MockConfigEntry(domain=DOMAIN, data={CONF_API_KEY: FAKE_KEY}).add_to_hass(hass)
@@ -69,3 +103,29 @@ async def test_single_instance(hass: HomeAssistant) -> None:
     )
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "single_instance_allowed"
+
+
+async def test_options_flow_changes_settings(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+) -> None:
+    """Settings can be changed later; the entry reloads with them."""
+    entry = MockConfigEntry(domain=DOMAIN, data={CONF_API_KEY: FAKE_KEY}, options=SETTINGS)
+    entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "init"
+
+    new_settings = {**SETTINGS, CONF_PROFILE: "visit"}
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"], new_settings
+    )
+    await hass.async_block_till_done()
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert entry.options == new_settings
+    assert aioclient_mock.call_count == 0  # no position known yet: no lookup
+
+    assert await hass.config_entries.async_unload(entry.entry_id)
+    await hass.async_block_till_done()
