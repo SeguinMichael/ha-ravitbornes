@@ -29,8 +29,9 @@ Chaîne complète en place, **jamais testée dans une vraie installation HA ni d
 ### Capteurs (`sensor.py`, `display.py`)
 
 - 6 capteurs « Borne 1 » à « Borne 6 » (`sensor.ravitbornes_station_N`), rattachés à un appareil de service « RavitBornes ». Inconnus s'il y a moins de bornes.
-- **État** : texte court dans la langue de HA (fr ou en), ex. `Ionity · 150 kW · 1,2 km · 3/6 libres` ; si seules des prises plus lentes sont libres, `Ionity · 50 kW libre (max 350) · 0,1 km · 1/5` ; `… · complet` (aucune prise compatible libre : forme texte de la ligne grisée), `… · dispo ?` (pas de donnée).
-- **Attributs** : `latitude` / `longitude` **de la borne** (pour la navigation depuis Android Auto), `station`, `distance_km`, `power_kw`, `free_power_kw` (meilleure prise compatible libre), `available`, `total`, `status`.
+- **Nom** : « Réseau (rue) », réseau long remplacé par son sigle (ex. `SDESM (Place Notre Dame)`).
+- **État** : texte court dans la langue de HA (fr ou en), ex. `IONITY (Aire X) · 150 kW · 1,2 km · 3/6 libres` ; si seules des prises plus lentes sont libres, `Ionity · 50 kW libre (max 350) · 0,1 km · 1/5` ; `… · complet` (aucune prise compatible libre : forme texte de la ligne grisée), `… · dispo ?` (pas de donnée).
+- **Attributs** : `latitude` / `longitude` **de la borne** (pour la navigation depuis Android Auto), `station` (nom complet), `street`, `distance_km`, `power_kw`, `free_power_kw` (meilleure prise compatible libre), `available`, `total`, `status`.
 
 ### Boutons et bornes masquées (`button.py`, `exclusions.py`)
 

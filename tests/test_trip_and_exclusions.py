@@ -121,7 +121,7 @@ async def test_freshest_position_source_wins(
     _set_position(hass, 45.1, 4.2)  # phone, more recent
     _mock_tomtom(aioclient_mock)
     entry = await _setup(hass, **{CONF_POSITION_ENTITIES: [CAR, TRACKER]})
-    assert hass.states.get(STATION_1).state.startswith("Example Recharge · 22 kW · 0 km")
+    assert hass.states.get(STATION_1).state.startswith("Example Recharge (Example Street) · 22 kW · 0 km")
 
     freezer.tick(timedelta(seconds=30))
     # The car has moved and reports a new position: it becomes the freshest source.

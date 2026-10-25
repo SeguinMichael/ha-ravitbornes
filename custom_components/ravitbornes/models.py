@@ -32,6 +32,7 @@ class Station:
     connectors: tuple[ConnectorGroup, ...]
     availability_id: str | None
     address: str = ""
+    street: str = ""
 
     @property
     def max_power_kw(self) -> float:
@@ -94,6 +95,8 @@ def parse_stations(payload: dict[str, Any]) -> list[Station]:
                     .get("id")
                 ),
                 address=(result.get("address") or {}).get("freeformAddress", ""),
+                # TomTom pads some street names with spaces.
+                street=" ".join(((result.get("address") or {}).get("streetName") or "").split()),
             )
         )
     return stations

@@ -80,9 +80,15 @@ Une borne peut être « disponible » seulement sur ses prises lentes (cas réel
 
 Les connecteurs (CCS, CHAdeMO, Type 2…) se choisissent à la configuration : seules les prises cochées comptent.
 
+## Nom affiché (décision 2026-10-25)
+
+Format **« Réseau (rue) »**, ex. `IONITY (A77, Aire du Jardin des Arbres)`, `SDESM (Place Notre Dame)`. Le nom de réseau est gardé s'il fait 20 caractères ou moins, sinon remplacé par le **sigle** de ses mots significatifs (accents et mots vides retirés : « Syndicat Départemental Des Énergies De Seine-Et-Marne » → `SDESM`). La rue vient de `streetName` (espaces superflus retirés), coupée à 30 caractères. Motif : beaucoup de bornes publiques partagent un même nom long d'opérateur, illisible une fois tronqué.
+
 ## Tarifs — limite assumée
 
 TomTom ne fournit pas de tarifs en libre-service. Le champ tarif de l'IRVE est mal renseigné et le prix réel dépend du contrat eMSP (badge, roaming, abonnement). Objectif : « dispo fiable + tarif approximatif ». Badge / pass eMSP écarté de la configuration.
+
+**Décision (2026-10-25)** : lors du chantier IRVE, prévoir les tarifs comme une source interchangeable — **TomTom** si la clé de l'utilisateur donne accès à une API tarifaire (ex. EV Search API ou offre sous contrat), **IRVE** sinon (repli).
 
 ## Exposition dans la voiture (décision 2026-10-24)
 

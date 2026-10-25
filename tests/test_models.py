@@ -26,6 +26,7 @@ def test_parse_stations_aggregates_plugs() -> None:
     }
     assert park.max_power_kw == 22.0
     assert park.address == "1 Example Street, 00000 Exampleville"
+    assert park.street == "Example Street"
 
 
 def test_parse_stations_keeps_dc_and_missing_availability() -> None:

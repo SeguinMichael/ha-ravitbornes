@@ -18,6 +18,7 @@ But : valider l'affichage voiture **avant** d'écrire l'intégration, sans code.
 - Créer dans HA un capteur `template:` avec attributs `latitude` / `longitude` (une borne connue) et un état textuel (« 150 kW · 3/6 libres »).
 - Vérifier dans Android Auto : le capteur apparaît-il dans la **navigation** ? Le guidage se lance-t-il ? L'état est-il lisible en favori ?
 - Envoyer une notification avec `car_ui: true` : s'affiche-t-elle sur l'écran de la voiture, avec quelles actions ?
+- **Toucher une borne → confirmation → guidage** (demande 2026-10-25) : l'écran « Navigation » du companion app demande-t-il une confirmation avant de lancer le guidage ? Un appui sur un favori fait-il quelque chose ? Une action de notification (`uri: geo:lat,lon`) lance-t-elle la navigation dans la voiture ?
 - Livrable : constats dans `conception.md` (section exposition) ; go / no-go de la voie HA.
 
 ## 2. Fin du spike TomTom

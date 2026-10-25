@@ -71,6 +71,7 @@ class StationSensor(CoordinatorEntity[RavitBornesCoordinator], SensorEntity):
             ATTR_LATITUDE: item.station.latitude,
             ATTR_LONGITUDE: item.station.longitude,
             "station": item.station.name,
+            "street": item.station.street,
             "distance_km": round(item.distance_m / 1000, 1),
             "power_kw": item.power_kw,
             "free_power_kw": item.free_power_kw,

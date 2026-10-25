@@ -86,13 +86,13 @@ async def test_sensors_show_nearest_stations(
     entry = await _setup(hass)
 
     first = hass.states.get(STATION_1)
-    assert first.state == "Example Recharge · 22 kW · 0 km · 8/12 free"
+    assert first.state == "Example Recharge (Example Street) · 22 kW · 0 km · 8/12 free"
     assert first.attributes[ATTR_LATITUDE] == 45.1
     assert first.attributes[ATTR_LONGITUDE] == 4.2
     assert first.attributes["status"] == "available"
 
     second = hass.states.get(STATION_2)
-    assert second.state == "Example Slow · 7 kW · 0.9 km · full"
+    assert second.state == "Example Slow (Example Avenue) · 7 kW · 0.9 km · full"
     assert second.attributes["status"] == "unavailable"
 
     assert hass.states.get(STATION_3).state == STATE_UNKNOWN

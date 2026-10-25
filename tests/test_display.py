@@ -2,7 +2,7 @@
 
 from dataclasses import replace
 
-from custom_components.ravitbornes.display import format_station
+from custom_components.ravitbornes.display import format_station, network_name, station_label
 from custom_components.ravitbornes.models import ConnectorGroup, Station
 from custom_components.ravitbornes.scoring import AvailabilityStatus, RankedStation
 
@@ -46,11 +46,36 @@ def test_decimal_separator() -> None:
     assert " · 7.4 kW · 0 km · " in format_station(item, "en")
 
 
-def test_long_names_are_truncated() -> None:
+def test_long_single_word_names_are_truncated() -> None:
     station = replace(STATION, name="X" * 100)
     item = RankedStation(station, 0.0, 150.0, None, None, AvailabilityStatus.UNKNOWN)
 
-    assert format_station(item, "en").startswith("X" * 40 + " · ")
+    assert format_station(item, "en").startswith("X" * 20 + " · ")
+
+
+def test_label_is_network_then_street() -> None:
+    """Decision 2026-10-25: 'Network (street)'; long network names become initials."""
+    public = replace(
+        STATION,
+        name="Syndicat Départemental Des Énergies De Seine-Et-Marne",
+        street="Place Notre Dame",
+    )
+    assert station_label(public) == "SDESM (Place Notre Dame)"
+    assert station_label(replace(STATION, name="IONITY", street="A00, Example Rest Area")) == (
+        "IONITY (A00, Example Rest Area)"
+    )
+    assert station_label(STATION) == "Example Fast Charge"  # no street known
+
+
+def test_long_streets_are_shortened() -> None:
+    label = station_label(replace(STATION, name="Izivia", street="A" * 50))
+
+    assert label == "Izivia (" + "A" * 29 + "…)"
+
+
+def test_network_name_initials() -> None:
+    assert network_name("TotalEnergies") == "TotalEnergies"
+    assert network_name("Compagnie Nationale du Rhône Recharge") == "CNRR"
 
 
 def test_only_slower_connectors_free() -> None:
