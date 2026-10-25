@@ -17,8 +17,9 @@ Chaîne complète en place, **jamais testée dans une vraie installation HA ni d
 
 - **Position** : parmi les sources configurées ayant des coordonnées, celle **rapportée le plus récemment** (`last_reported`).
 - **Sans entité de trajet** : pas de minuterie ; rafraîchissement déclenché par un changement d'une source de position, seulement si la voiture a bougé d'au moins **200 m** ; au plus un par **minute** (anti-rebond).
-- **Avec entité de trajet** : allumée → rafraîchissement **toutes les 3 min même à l'arrêt**, plus les déplacements ; éteinte → aucun appel, liste vidée, déplacements ignorés.
-- **À la maison** (état `home` de la source retenue) ou position inconnue : aucun appel ; la liste est vidée en rentrant.
+- **Avec entité de trajet** : allumée → rafraîchissement **toutes les 3 min même à l'arrêt**, plus les déplacements ; éteinte → aucun appel automatique, liste vidée, déplacements ignorés.
+- **Recherche manuelle** (bouton « Rechercher des bornes (30 min) ») : recherche immédiate puis toutes les 3 min pendant 30 min, hors trajet et à la maison compris ; un nouvel appui relance les 30 min ; à l'échéance, liste vidée aussitôt sauf trajet en cours.
+- **À la maison** (état `home` de la source retenue) ou position inconnue : aucun appel hors recherche manuelle ; la liste est vidée en rentrant.
 - Les **bornes masquées** sont retirées avant le classement.
 - **Liste des bornes** : recherche autour de la position **arrondie** (~1 km), rayon = rayon du profil + 1 km, 50 résultats au plus, doublons fusionnés ; gardée en mémoire **6 h** par (zone, profil).
 - **Disponibilité** : demandée seulement pour les bornes affichées (tri par distance, donc connu avant), gardée **3 min** par borne.
@@ -31,8 +32,9 @@ Chaîne complète en place, **jamais testée dans une vraie installation HA ni d
 - **État** : texte court dans la langue de HA (fr ou en), ex. `Ionity · 150 kW · 1,2 km · 3/6 libres`, `… · complet` (aucune prise compatible libre : forme texte de la ligne grisée), `… · dispo ?` (pas de donnée).
 - **Attributs** : `latitude` / `longitude` **de la borne** (pour la navigation depuis Android Auto), `station`, `distance_km`, `power_kw`, `available`, `total`, `status`.
 
-### Bornes masquées (`button.py`, `exclusions.py`)
+### Boutons et bornes masquées (`button.py`, `exclusions.py`)
 
+- Bouton « Rechercher des bornes (30 min) » (`button.ravitbornes_search_stations_30_min`), toujours disponible.
 - 6 boutons « Masquer la borne N » (`button.ravitbornes_hide_station_N`), indisponibles quand l'emplacement est vide. Un appui masque la borne affichée et réaffiche la liste aussitôt, depuis les caches (sans nouvel appel TomTom tant que les caches sont valides).
 - Liste **persistante** dans `.storage/ravitbornes.<entry_id>.excluded` (ID TomTom, nom, adresse, position de la borne) ; supprimée quand l'intégration est retirée.
 - Une borne est reconnue comme masquée par son ID **ou** par sa position (≤ 25 m), au cas où TomTom change l'ID.
@@ -58,5 +60,6 @@ Chaîne complète en place, **jamais testée dans une vraie installation HA ni d
 - `tests/fixtures/` : réponses TomTom réelles, structure conservée, contenu anonymisé.
 - `test_sensor.py` (bout en bout) : bornes les plus proches et leurs états, petit déplacement ignoré, cache réutilisé, nouvelle zone, rien à la maison, quota partiel, clé refusée au démarrage.
 - `test_scoring.py`, `test_models.py`, `test_api.py` (dont **absence de la clé** dans logs et erreurs), `test_cache.py`, `test_display.py`, `test_diagnostics.py` (**ni clé, ni entité, ni coordonnées**), `test_config_flow.py` (deux étapes, erreurs, options), `test_init.py`.
+- `test_manual_search.py` : pas de minuterie sans entité de trajet (non-régression), bouton à la maison et hors trajet, sans entité de trajet, effacement immédiat à l'échéance, relance de la fenêtre, fin de trajet pendant la fenêtre.
 - `test_trip_and_exclusions.py` : rafraîchissement toutes les 3 min pendant le trajet et arrêt ensuite, déplacements ignorés hors trajet, source de position la plus récente, bouton « Masquer » (persistance, rechargement, aucun appel TomTom), reconnaissance par position, emplacement vide, démasquage dans les options.
-- Contrôle de pertinence : désactiver le seuil de 200 m, le cache de disponibilité, l'exception « maison », la dégradation sur quota (2026-10-24), la minuterie de trajet, l'entité de trajet, le choix par fraîcheur, le filtrage des bornes masquées ou la reconnaissance par position (2026-10-25) fait échouer au moins un test.
+- Contrôle de pertinence : désactiver le seuil de 200 m, le cache de disponibilité, l'exception « maison », la dégradation sur quota (2026-10-24), la minuterie de trajet, l'entité de trajet, le choix par fraîcheur, le filtrage des bornes masquées la reconnaissance par position, la dérogation « maison » du bouton, la relance de la fenêtre, l'effacement à l'échéance ou la minuterie sans entité de trajet (2026-10-25) fait échouer au moins un test.

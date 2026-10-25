@@ -22,7 +22,7 @@
         },
         "data_description": {
           "position_entities": "Phone and/or car trackers. The most recently updated one is used. Nothing is looked up while it is at home.",
-          "trip_entity": "For example the companion app's Android Auto sensor. While it is on, availability is refreshed every 3 minutes, even when the car is stopped; while it is off, nothing is looked up.",
+          "trip_entity": "For example the companion app's Android Auto sensor. While it is on, availability is refreshed every 3 minutes, even when the car is stopped; while it is off, nothing is looked up automatically (the \"Search stations (30 min)\" button still works).",
           "connectors": "Only stations with at least one of these connectors are shown.",
           "profile": "Highway: fast DC charging close to the road. Visit: any charger close to where you stop."
         }
@@ -53,7 +53,7 @@
         },
         "data_description": {
           "position_entities": "Phone and/or car trackers. The most recently updated one is used. Nothing is looked up while it is at home.",
-          "trip_entity": "For example the companion app's Android Auto sensor. While it is on, availability is refreshed every 3 minutes, even when the car is stopped; while it is off, nothing is looked up.",
+          "trip_entity": "For example the companion app's Android Auto sensor. While it is on, availability is refreshed every 3 minutes, even when the car is stopped; while it is off, nothing is looked up automatically (the \"Search stations (30 min)\" button still works).",
           "connectors": "Only stations with at least one of these connectors are shown.",
           "profile": "Highway: fast DC charging close to the road. Visit: any charger close to where you stop.",
           "excluded": "Untick a station to show it again."
@@ -92,6 +92,9 @@
       }
     },
     "button": {
+      "search_stations": {
+        "name": "Search stations (30 min)"
+      },
       "exclude_station": {
         "name": "Hide station {index}"
       }

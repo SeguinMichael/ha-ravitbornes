@@ -6,6 +6,9 @@
       }
     },
     "button": {
+      "search_stations": {
+        "default": "mdi:magnify"
+      },
       "exclude_station": {
         "default": "mdi:eye-off"
       }

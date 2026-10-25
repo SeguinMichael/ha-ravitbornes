@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 import logging
 
 from homeassistant.config_entries import ConfigEntry
@@ -13,9 +13,17 @@ from homeassistant.const import (
     STATE_HOME,
     STATE_ON,
 )
-from homeassistant.core import Event, EventStateChangedData, HomeAssistant, State, callback
+from homeassistant.core import (
+    CALLBACK_TYPE,
+    Event,
+    EventStateChangedData,
+    HomeAssistant,
+    State,
+    callback,
+)
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.debounce import Debouncer
+from homeassistant.helpers.event import async_call_later
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util import dt as dt_util
 
@@ -46,6 +54,8 @@ STATIONS_TTL_S = 6 * 3600
 AVAILABILITY_TTL_S = 180
 # While the trip entity is on, refresh at TomTom's pace even if the car is stopped.
 TRIP_REFRESH = timedelta(seconds=AVAILABILITY_TTL_S)
+# "Search for 30 minutes" button: same pace, outside trips and even at home.
+MANUAL_SEARCH = timedelta(minutes=30)
 # Ignore GPS jitter: refresh only once the car has moved this far.
 MIN_MOVE_M = 200
 # The search is centred on the rounded zone, which can be ~700 m away from the car.
@@ -62,9 +72,9 @@ def _timestamp() -> float:
 
 
 class RavitBornesCoordinator(DataUpdateCoordinator[list[RankedStation]]):
-    """Refreshed when the car moves and, during a trip, every 3 minutes.
+    """Refreshed when the car moves and, during a trip or a manual search, every 3 minutes.
 
-    Without a trip entity, there is no timer at all: no polling outside trips.
+    Without a trip entity and outside a manual search, there is no timer at all.
     """
 
     config_entry: RavitBornesConfigEntry
@@ -91,7 +101,10 @@ class RavitBornesCoordinator(DataUpdateCoordinator[list[RankedStation]]):
             AVAILABILITY_TTL_S, _timestamp
         )
         self._last_position: tuple[float, float] | None = None
-        self.update_interval = TRIP_REFRESH if self.trip_active else None
+        self._search_until: datetime | None = None
+        self._cancel_search_end: CALLBACK_TYPE | None = None
+        self.update_interval = self._refresh_interval()
+        entry.async_on_unload(self._cancel_search_timer)
 
     @property
     def position_entities(self) -> list[str]:
@@ -111,6 +124,22 @@ class RavitBornesCoordinator(DataUpdateCoordinator[list[RankedStation]]):
         state = self.hass.states.get(self.trip_entity)
         return state is not None and state.state == STATE_ON
 
+    @property
+    def manual_search_active(self) -> bool:
+        """Whether a "search for 30 minutes" window is running."""
+        return self._search_until is not None and dt_util.utcnow() < self._search_until
+
+    @property
+    def lookups_allowed(self) -> bool:
+        """Lookups happen during a trip or during a manual search window."""
+        return self.manual_search_active or self.trip_active
+
+    def _refresh_interval(self) -> timedelta | None:
+        """Timer only during a manual search or while the trip entity is on."""
+        if self.manual_search_active or (self.trip_entity is not None and self.trip_active):
+            return TRIP_REFRESH
+        return None
+
     def _freshest_position_state(self) -> State | None:
         """Among the position sources with coordinates, the most recently reported."""
         states = [
@@ -123,9 +152,14 @@ class RavitBornesCoordinator(DataUpdateCoordinator[list[RankedStation]]):
         return max(states, key=lambda state: state.last_reported, default=None)
 
     def current_position(self) -> tuple[float, float] | None:
-        """Car position, or None when unknown or at home (nothing is looked up then)."""
+        """Position to search around, or None when nothing should be looked up.
+
+        At home nothing is looked up, unless the user asked for a manual search.
+        """
+        if not self.lookups_allowed:
+            return None
         state = self._freshest_position_state()
-        if state is None or state.state == STATE_HOME:
+        if state is None or (state.state == STATE_HOME and not self.manual_search_active):
             return None
         return float(state.attributes[ATTR_LATITUDE]), float(state.attributes[ATTR_LONGITUDE])
 
@@ -137,7 +171,7 @@ class RavitBornesCoordinator(DataUpdateCoordinator[list[RankedStation]]):
     @callback
     def async_position_changed(self, event: Event[EventStateChangedData]) -> None:
         """Refresh when the car has really moved; clear the list once home."""
-        if not self.trip_active:
+        if not self.lookups_allowed:
             return
         position = self.current_position()
         if position is None:
@@ -153,12 +187,40 @@ class RavitBornesCoordinator(DataUpdateCoordinator[list[RankedStation]]):
     @callback
     def async_trip_changed(self, event: Event[EventStateChangedData]) -> None:
         """Start refreshing at trip start (every 3 min); stop and clear at trip end."""
-        if self.trip_active:
-            self.update_interval = TRIP_REFRESH
+        self.update_interval = self._refresh_interval()
+        if self.lookups_allowed:
             self._request_refresh()
         else:
-            self.update_interval = None
             self._clear()
+
+    async def async_start_search(self) -> None:
+        """Look up now, then every 3 min for 30 min, even outside a trip or at home.
+
+        Pressing again restarts the 30 minutes.
+        """
+        self._cancel_search_timer()
+        self._search_until = dt_util.utcnow() + MANUAL_SEARCH
+        self._cancel_search_end = async_call_later(
+            self.hass, MANUAL_SEARCH, self._async_search_ended
+        )
+        self.update_interval = self._refresh_interval()
+        self._last_position = None  # a manual search always refreshes
+        await self.async_refresh()
+
+    @callback
+    def _async_search_ended(self, _now: datetime) -> None:
+        """Back to normal: keep going only if a trip is still on."""
+        self._cancel_search_end = None
+        self._search_until = None
+        self.update_interval = self._refresh_interval()
+        if self.current_position() is None:
+            self._clear()
+
+    @callback
+    def _cancel_search_timer(self) -> None:
+        if self._cancel_search_end is not None:
+            self._cancel_search_end()
+            self._cancel_search_end = None
 
     async def async_exclude(self, station: Station) -> None:
         """Hide a station and show the next one right away (from the caches)."""
@@ -184,7 +246,7 @@ class RavitBornesCoordinator(DataUpdateCoordinator[list[RankedStation]]):
 
     async def _async_update_data(self) -> list[RankedStation]:
         """Search stations (cached per zone), then fetch availability of the shown ones."""
-        position = self.current_position() if self.trip_active else None
+        position = self.current_position()
         if position is None:
             self._last_position = None
             return []

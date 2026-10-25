@@ -26,6 +26,7 @@ async def async_get_config_entry_diagnostics(
         "options": async_redact_data(dict(entry.options), TO_REDACT),
         "last_update_success": coordinator.last_update_success,
         "trip_active": coordinator.trip_active,
+        "manual_search_active": coordinator.manual_search_active,
         "stations": len(stations),
         "statuses": sorted(item.status.value for item in stations),
         # Which stations a user hides says something about their habits: count only.

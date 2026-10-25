@@ -11,7 +11,7 @@ Intégration Home Assistant qui repère les **bornes de recharge disponibles** a
 1. La position de la voiture est lue depuis une ou plusieurs entités Home Assistant (`device_tracker` du téléphone et/ou de la voiture, ou `person`) ; la plus récemment mise à jour l'emporte. Aucune recherche n'est faite tant que vous êtes à la maison.
 2. Quand la voiture a bougé — et, si vous choisissez une entité de *trajet* comme le capteur Android Auto du companion app, toutes les 3 minutes tant qu'elle est allumée, même à l'arrêt — l'intégration demande à **TomTom** les bornes autour de vous et leur **disponibilité en temps réel** (libre / occupée / hors service, par type de connecteur et puissance).
 3. Les bornes sont filtrées selon les connecteurs de la voiture et un profil de recharge — **autoroute** (DC, 50 kW ou plus, à moins de 5 km) ou **visite** (toute puissance, à moins de 2 km) — puis triées par distance.
-4. Les 6 plus proches sont exposées sous forme de capteurs **Borne 1…6**, par exemple `Ionity · 150 kW · 1,2 km · 3/6 libres` (ou `complet` si aucune prise compatible n'est libre). Chacun porte la latitude / longitude de la borne, pour **lancer la navigation depuis Android Auto**. Un bouton **Masquer la borne N** écarte une borne dont vous ne voulez pas (mauvaise expérience, trop fréquentée, peu accessible…) ; les bornes masquées restent sur votre Home Assistant et se réaffichent depuis les options de l'intégration.
+4. Les 6 plus proches sont exposées sous forme de capteurs **Borne 1…6**, par exemple `Ionity · 150 kW · 1,2 km · 3/6 libres` (ou `complet` si aucune prise compatible n'est libre). Chacun porte la latitude / longitude de la borne, pour **lancer la navigation depuis Android Auto**. Un bouton **Rechercher des bornes (30 min)** lance une recherche tout de suite puis toutes les 3 minutes pendant 30 minutes, même hors trajet ou à la maison. Un bouton **Masquer la borne N** écarte une borne dont vous ne voulez pas (mauvaise expérience, trop fréquentée, peu accessible…) ; les bornes masquées restent sur votre Home Assistant et se réaffichent depuis les options de l'intégration.
 
 Prévu : une notification voiture sur opportunité, la recherche le long de l'itinéraire, des tarifs approximatifs.
 
@@ -31,7 +31,7 @@ Prévu : une notification voiture sur opportunité, la recherche le long de l'it
 
 - La clé API est stockée dans l'entrée de configuration Home Assistant et n'est jamais écrite dans les journaux.
 - La position est **arrondie à une zone** avant tout appel à une API externe : TomTom reçoit une zone, pas la position exacte.
-- Tous les appels partent du serveur Home Assistant, jamais du téléphone. Aucun appel n'est fait quand vous êtes à la maison.
+- Tous les appels partent du serveur Home Assistant, jamais du téléphone. Aucun appel n'est fait quand vous êtes à la maison, sauf si vous appuyez sur *Rechercher des bornes*.
 - Les diagnostics (pour signaler un bug) ne contiennent ni la clé, ni l'entité de position, ni aucune coordonnée.
 
 ## Sources de données
