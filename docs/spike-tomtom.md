@@ -49,12 +49,12 @@ TomTom peut-il être la source principale de disponibilité temps réel, en usag
 ### Q2 — couverture autoroute : premier essai (2026-10-25), à compléter
 
 - `nearbySearch` (rayon 3 km, limite 5) centré sur une **aire d'autoroute choisie au hasard** (deux aires face à face) : **un seul résultat**, une borne **AC** de village à 1,1 km (2 × Type 2 22 kW + 2 prises domestiques). **Aucune borne sur les aires elles-mêmes.**
-- Aire choisie au hasard (précision de l'utilisateur, 2026-10-25) : l'absence de borne trouvée ne prouve **pas** un trou de couverture — ces aires n'en ont peut-être pas. À recouper par une source indépendante (vérification manuelle dans Chargemap, sans extraction).
+- Aire choisie au hasard ; **vérifié par l'utilisateur (2026-10-25)** : l'aire n'a effectivement **pas de borne**, et il y en a bien dans le village voisin. TomTom est **exact** sur ce cas (absence sur l'aire, borne du village trouvée).
 - `chargingAvailability` sur cette borne : OK ; libellés de connecteur et puissances **identiques** entre recherche et disponibilité (`StandardHouseholdCountrySpecific` 3 kW, `IEC62196Type2Outlet` 22 kW). Le code (`parse_stations`, `parse_availability`, `rank_stations`) donne sur ces réponses réelles : 22 kW, 1,1 km, 2/2 libres, prise domestique non comptée pour une voiture Type 2.
 - **Échantillon DC (2026-10-25)** : seconde aire d'autoroute, où l'utilisateur sait qu'il y a des bornes rapides : TomTom trouve **le hub de recharge de l'aire** (4 × CCS 350 kW, 1 × CCS 50 kW, 1 × CHAdeMO 50 kW, 1 × Type 2 câblé 43 kW AC), avec identifiant de disponibilité ; un seul résultat dans 2 km (autres réseaux éventuels de l'aire : à vérifier).
 - Disponibilité du hub : libellés DC **identiques** à la recherche (`IEC62196Type2CCS`, `Chademo`), puissances distinctes par niveau (350 / 50 kW) ; statuts `unknown` et `outOfService` présents. Réponses anonymisées versées en données de test (`nearby_search_dc.json`, `charging_availability_dc.json`).
 - **Défaut d'affichage révélé** : CCS 350 kW tous occupés ou inconnus, seul le CCS 50 kW libre → l'affichage annonçait « 350 kW · 1/5 libres ». Corrigé (décision utilisateur 2026-10-25) : puissance de la meilleure prise libre en tête, « 50 kW libre (max 350) · … · 1/5 ».
-- Couverture des aires : sur l'aire où l'utilisateur **sait** qu'il y a des bornes, TomTom trouve le hub ; la première aire (au hasard) ne permet pas de conclure. Échantillon encore trop petit : d'autres aires connues à tester, et vérifier si tous les réseaux présents sur une aire remontent.
+- Couverture des aires : **2 aires vérifiées sur le terrain, 2 concordances** (une sans borne, une avec un hub DC trouvé). Encourageant, mais échantillon trop petit pour conclure : tester d'autres aires, dont une avec **plusieurs réseaux**, pour vérifier qu'ils remontent tous.
 
 ## Reste à faire
 
