@@ -101,3 +101,39 @@ def test_limit() -> None:
     ranked = rank_stations(_stations(), {}, *ORIGIN, TYPE2, VISIT, limit=1)
 
     assert [r.station.poi_id for r in ranked] == ["poi-example-park-a"]
+
+
+# Real highway hub (anonymized): 4 x CCS 350 kW busy or unknown, CCS 50 kW free,
+# CHAdeMO 50 kW free, Type 2 cable 43 kW out of service.
+HUB = "00000000-0000-4000-8000-000000000010"
+HUB_ORIGIN = (46.5, 3.5)
+
+
+def _hub(connector_types, profile):
+    stations = parse_stations(load_json_fixture("nearby_search_dc.json"))
+    availability = {HUB: parse_availability(load_json_fixture("charging_availability_dc.json"))}
+    return rank_stations(stations, availability, *HUB_ORIGIN, connector_types, profile)
+
+
+def test_real_dc_hub_reports_the_best_free_power() -> None:
+    """Only the 50 kW CCS is free: the station is available, but not at 350 kW."""
+    (hub,) = _hub(CCS, HIGHWAY)
+
+    assert hub.status is AvailabilityStatus.AVAILABLE
+    assert (hub.available, hub.total) == (1, 5)
+    assert hub.power_kw == 350.0
+    assert hub.free_power_kw == 50.0
+
+
+def test_real_dc_hub_for_a_chademo_car() -> None:
+    (hub,) = _hub({"Chademo"}, HIGHWAY)
+
+    assert (hub.available, hub.total, hub.power_kw, hub.free_power_kw) == (1, 1, 50.0, 50.0)
+
+
+def test_real_dc_hub_out_of_service_ac() -> None:
+    """The only Type 2 cable is out of service: full for a Type 2 car."""
+    (hub,) = _hub({"IEC62196Type2CableAttached"}, VISIT)
+
+    assert hub.status is AvailabilityStatus.UNAVAILABLE
+    assert hub.free_power_kw is None

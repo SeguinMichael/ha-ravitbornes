@@ -51,3 +51,21 @@ def test_long_names_are_truncated() -> None:
     item = RankedStation(station, 0.0, 150.0, None, None, AvailabilityStatus.UNKNOWN)
 
     assert format_station(item, "en").startswith("X" * 40 + " · ")
+
+
+def test_only_slower_connectors_free() -> None:
+    """Decision 2026-10-25: show the free power first, the max in brackets."""
+    item = RankedStation(
+        STATION, 141.0, 350.0, 1, 5, AvailabilityStatus.AVAILABLE, free_power_kw=50.0
+    )
+
+    assert format_station(item, "fr") == "Example Fast Charge · 50 kW libre (max 350) · 0,1 km · 1/5"
+    assert format_station(item, "en") == "Example Fast Charge · 50 kW free (max 350) · 0.1 km · 1/5"
+
+
+def test_best_power_free_keeps_the_short_form() -> None:
+    item = RankedStation(
+        STATION, 141.0, 350.0, 2, 5, AvailabilityStatus.AVAILABLE, free_power_kw=350.0
+    )
+
+    assert format_station(item, "fr") == "Example Fast Charge · 350 kW · 0,1 km · 2/5 libres"

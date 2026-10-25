@@ -29,8 +29,8 @@ Chaîne complète en place, **jamais testée dans une vraie installation HA ni d
 ### Capteurs (`sensor.py`, `display.py`)
 
 - 6 capteurs « Borne 1 » à « Borne 6 » (`sensor.ravitbornes_station_N`), rattachés à un appareil de service « RavitBornes ». Inconnus s'il y a moins de bornes.
-- **État** : texte court dans la langue de HA (fr ou en), ex. `Ionity · 150 kW · 1,2 km · 3/6 libres`, `… · complet` (aucune prise compatible libre : forme texte de la ligne grisée), `… · dispo ?` (pas de donnée).
-- **Attributs** : `latitude` / `longitude` **de la borne** (pour la navigation depuis Android Auto), `station`, `distance_km`, `power_kw`, `available`, `total`, `status`.
+- **État** : texte court dans la langue de HA (fr ou en), ex. `Ionity · 150 kW · 1,2 km · 3/6 libres` ; si seules des prises plus lentes sont libres, `Ionity · 50 kW libre (max 350) · 0,1 km · 1/5` ; `… · complet` (aucune prise compatible libre : forme texte de la ligne grisée), `… · dispo ?` (pas de donnée).
+- **Attributs** : `latitude` / `longitude` **de la borne** (pour la navigation depuis Android Auto), `station`, `distance_km`, `power_kw`, `free_power_kw` (meilleure prise compatible libre), `available`, `total`, `status`.
 
 ### Boutons et bornes masquées (`button.py`, `exclusions.py`)
 
@@ -59,6 +59,7 @@ Chaîne complète en place, **jamais testée dans une vraie installation HA ni d
 
 - `tests/fixtures/` : réponses TomTom réelles, structure conservée, contenu anonymisé.
 - `test_sensor.py` (bout en bout) : bornes les plus proches et leurs états, petit déplacement ignoré, cache réutilisé, nouvelle zone, rien à la maison, quota partiel, clé refusée au démarrage.
+- `tests/fixtures/nearby_search_dc.json`, `charging_availability_dc.json` : hub DC réel d'aire d'autoroute, anonymisé (2026-10-25).
 - `test_scoring.py`, `test_models.py`, `test_api.py` (dont **absence de la clé** dans logs et erreurs), `test_cache.py`, `test_display.py`, `test_diagnostics.py` (**ni clé, ni entité, ni coordonnées**), `test_config_flow.py` (deux étapes, erreurs, options), `test_init.py`.
 - `test_manual_search.py` : pas de minuterie sans entité de trajet (non-régression), bouton à la maison et hors trajet, sans entité de trajet, effacement immédiat à l'échéance, relance de la fenêtre, fin de trajet pendant la fenêtre.
 - `test_trip_and_exclusions.py` : rafraîchissement toutes les 3 min pendant le trajet et arrêt ensuite, déplacements ignorés hors trajet, source de position la plus récente, bouton « Masquer » (persistance, rechargement, aucun appel TomTom), reconnaissance par position, emplacement vide, démasquage dans les options.

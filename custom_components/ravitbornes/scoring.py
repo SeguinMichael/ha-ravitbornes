@@ -50,6 +50,8 @@ class RankedStation:
     available: int | None
     total: int | None
     status: AvailabilityStatus
+    # Power of the best compatible connector free right now (None if none is known free).
+    free_power_kw: float | None = None
 
 
 def compatible_groups(
@@ -67,19 +69,21 @@ def compatible_groups(
 
 def _availability(
     groups: list[ConnectorGroup], levels: list[ConnectorAvailability] | None
-) -> tuple[int | None, int | None, AvailabilityStatus]:
-    """Count free connectors among the compatible ones only."""
+) -> tuple[int | None, int | None, AvailabilityStatus, float | None]:
+    """Count free connectors among the compatible ones only, and the best free power."""
     if levels is None:
-        return None, None, AvailabilityStatus.UNKNOWN
+        return None, None, AvailabilityStatus.UNKNOWN, None
     keys = {(group.connector_type, group.power_kw) for group in groups}
     matching = [level for level in levels if (level.connector_type, level.power_kw) in keys]
     total = sum(level.total for level in matching)
     if total == 0:
         # Availability exists but not for these connectors: no evidence either way.
-        return None, None, AvailabilityStatus.UNKNOWN
+        return None, None, AvailabilityStatus.UNKNOWN, None
     available = sum(level.available for level in matching)
     status = AvailabilityStatus.AVAILABLE if available else AvailabilityStatus.UNAVAILABLE
-    return available, total, status
+    # A station can be "available" only on its slow connectors (e.g. 350 kW busy, 50 kW free).
+    free_power = max((level.power_kw for level in matching if level.available), default=None)
+    return available, total, status, free_power
 
 
 def rank_stations(
@@ -109,7 +113,7 @@ def rank_stations(
             if station.availability_id
             else None
         )
-        available, total, status = _availability(groups, levels)
+        available, total, status, free_power = _availability(groups, levels)
         ranked.append(
             RankedStation(
                 station=station,
@@ -118,6 +122,7 @@ def rank_stations(
                 available=available,
                 total=total,
                 status=status,
+                free_power_kw=free_power,
             )
         )
     ranked.sort(key=lambda item: item.distance_m)

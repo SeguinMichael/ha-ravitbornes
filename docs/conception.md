@@ -74,6 +74,12 @@ Deux presets en dur en v1, surchargeables plus tard. La puissance minimale n'est
   - À vérifier sur données réelles (spike Q2) : la disponibilité est rapprochée des connecteurs par (type, puissance) ; un écart de libellé entre la recherche et la disponibilité donnerait « inconnu ».
 - **v2** : temps d'accès réel en minutes (Matrix Routing, un appel pour les 10-15 meilleurs candidats). Sur autoroute, métrique cible = **temps total perdu = détour + temps de charge** : passer de 50 à 180 kW fait gagner 20-30 min, un détour de 5 min pèse peu à côté. Tout exprimer en minutes fait entrer la puissance dans le score sans pondération arbitraire.
 
+## Affichage de la puissance (décision 2026-10-25)
+
+Une borne peut être « disponible » seulement sur ses prises lentes (cas réel : 4 × 350 kW occupées, 50 kW libre). L'état montre alors la **puissance de la meilleure prise compatible libre** en tête et la puissance max entre parenthèses : `IONITY · 50 kW libre (max 350) · 0,1 km · 1/5`. Si la meilleure prise libre est aussi la plus puissante, forme courte inchangée (`350 kW · … · 2/5 libres`) ; aucune libre : `350 kW · … · complet`. Le tri reste par distance.
+
+Les connecteurs (CCS, CHAdeMO, Type 2…) se choisissent à la configuration : seules les prises cochées comptent.
+
 ## Tarifs — limite assumée
 
 TomTom ne fournit pas de tarifs en libre-service. Le champ tarif de l'IRVE est mal renseigné et le prix réel dépend du contrat eMSP (badge, roaming, abonnement). Objectif : « dispo fiable + tarif approximatif ». Badge / pass eMSP écarté de la configuration.

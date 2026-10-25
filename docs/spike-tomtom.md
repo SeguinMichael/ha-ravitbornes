@@ -51,7 +51,10 @@ TomTom peut-il être la source principale de disponibilité temps réel, en usag
 - `nearbySearch` (rayon 3 km, limite 5) centré sur une **aire d'autoroute** d'un trajet habituel (deux aires face à face) : **un seul résultat**, une borne **AC** de village à 1,1 km (2 × Type 2 22 kW + 2 prises domestiques). **Aucune borne sur les aires elles-mêmes.**
 - Deux lectures possibles : pas de borne rapide sur ces aires, ou **trou de couverture TomTom**. À trancher par une source indépendante (vérification manuelle dans Chargemap, sans extraction).
 - `chargingAvailability` sur cette borne : OK ; libellés de connecteur et puissances **identiques** entre recherche et disponibilité (`StandardHouseholdCountrySpecific` 3 kW, `IEC62196Type2Outlet` 22 kW). Le code (`parse_stations`, `parse_availability`, `rank_stations`) donne sur ces réponses réelles : 22 kW, 1,1 km, 2/2 libres, prise domestique non comptée pour une voiture Type 2.
-- Toujours **aucun échantillon DC** : la correspondance des libellés DC (CCS, CHAdeMO) reste à vérifier sur une vraie réponse.
+- **Échantillon DC (2026-10-25)** : seconde aire d'autoroute, où l'utilisateur sait qu'il y a des bornes rapides : TomTom trouve **le hub de recharge de l'aire** (4 × CCS 350 kW, 1 × CCS 50 kW, 1 × CHAdeMO 50 kW, 1 × Type 2 câblé 43 kW AC), avec identifiant de disponibilité ; un seul résultat dans 2 km (autres réseaux éventuels de l'aire : à vérifier).
+- Disponibilité du hub : libellés DC **identiques** à la recherche (`IEC62196Type2CCS`, `Chademo`), puissances distinctes par niveau (350 / 50 kW) ; statuts `unknown` et `outOfService` présents. Réponses anonymisées versées en données de test (`nearby_search_dc.json`, `charging_availability_dc.json`).
+- **Défaut d'affichage révélé** : CCS 350 kW tous occupés ou inconnus, seul le CCS 50 kW libre → l'affichage annonçait « 350 kW · 1/5 libres ». Corrigé (décision utilisateur 2026-10-25) : puissance de la meilleure prise libre en tête, « 50 kW libre (max 350) · … · 1/5 ».
+- Couverture des aires : 1 aire sur 2 sans aucune borne trouvée ; la seconde aire ne prouve pas l'absence de trou (à recouper avec Chargemap).
 
 ## Reste à faire
 
