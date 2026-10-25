@@ -4,6 +4,8 @@ DOMAIN = "ravitbornes"
 
 CONF_POSITION_ENTITIES = "position_entities"
 CONF_TRIP_ENTITY = "trip_entity"
+# Optional: "Hide station" only works while it is on (safety at the wheel).
+CONF_CHARGING_ENTITY = "charging_entity"
 CONF_CONNECTORS = "connectors"
 CONF_PROFILE = "profile"
 # Where approximate prices come from (decision 2026-10-25): nowhere, the IRVE

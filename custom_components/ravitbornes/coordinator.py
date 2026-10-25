@@ -24,10 +24,12 @@ from homeassistant.core import (
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.debounce import Debouncer
 from homeassistant.helpers.event import async_call_later
+from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util import dt as dt_util
 
 from .api import (
+    TomTomAuthError,
     TomTomClient,
     TomTomConnectionError,
     TomTomError,
@@ -36,6 +38,7 @@ from .api import (
 )
 from .cache import TTLCache
 from .const import (
+    CONF_CHARGING_ENTITY,
     CONF_CONNECTORS,
     CONF_POSITION_ENTITIES,
     CONF_PROFILE,
@@ -129,6 +132,19 @@ class RavitBornesCoordinator(DataUpdateCoordinator[list[RankedStation]]):
     def trip_entity(self) -> str | None:
         """Optional entity that is on during a trip (e.g. Android Auto connected)."""
         return self.config_entry.options.get(CONF_TRIP_ENTITY)
+
+    @property
+    def charging_entity(self) -> str | None:
+        """Optional entity that is on while the car charges."""
+        return self.config_entry.options.get(CONF_CHARGING_ENTITY)
+
+    @property
+    def hiding_allowed(self) -> bool:
+        """Without a charging entity, always; otherwise only while charging."""
+        if self.charging_entity is None:
+            return True
+        state = self.hass.states.get(self.charging_entity)
+        return state is not None and state.state == STATE_ON
 
     @property
     def trip_active(self) -> bool:
@@ -270,6 +286,9 @@ class RavitBornesCoordinator(DataUpdateCoordinator[list[RankedStation]]):
 
         try:
             stations = await self._stations_around(position, profile, connector_types)
+        except TomTomAuthError as err:
+            # Asks the user for a new key (reauth flow) instead of failing silently.
+            raise ConfigEntryAuthFailed(str(err)) from err
         except TomTomError as err:
             raise UpdateFailed(str(err)) from err
         stations = [s for s in stations if not self.exclusions.is_excluded(s)]
@@ -320,6 +339,8 @@ class RavitBornesCoordinator(DataUpdateCoordinator[list[RankedStation]]):
                 except (TomTomQuotaError, TomTomConnectionError) as err:
                     _LOGGER.warning("Availability partly missing: %s", err)
                     break
+                except TomTomAuthError as err:
+                    raise ConfigEntryAuthFailed(str(err)) from err
                 except TomTomError as err:
                     raise UpdateFailed(str(err)) from err
                 self._availability.set(availability_id, levels)

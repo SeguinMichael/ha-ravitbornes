@@ -19,14 +19,26 @@
           "trip_entity": "Trip in progress (optional)",
           "connectors": "Compatible connectors",
           "profile": "Charging profile",
-          "tariffs": "Prices (France)"
+          "tariffs": "Prices (France)",
+          "charging_entity": "Charging (optional)"
         },
         "data_description": {
           "position_entities": "Phone and/or car trackers. The most recently updated one is used. Nothing is looked up while it is at home.",
           "trip_entity": "For example the companion app's Android Auto sensor. While it is on, availability is refreshed every 3 minutes, even when the car is stopped; while it is off, nothing is looked up automatically (the \"Search stations (30 min)\" button still works).",
           "connectors": "Only stations with at least one of these connectors are shown.",
           "profile": "Highway: fast DC charging close to the road. Visit: any charger close to where you stop.",
-          "tariffs": "Approximate price per kWh from the national IRVE open data. Online: data.gouv.fr is asked about the shown stations only (their position, which still reveals your area to within a few km). Local file: the whole file (about 120 MB) is downloaded once a week and matched on your server; no position is sent. Off: no prices."
+          "tariffs": "Approximate price per kWh from the national IRVE open data. Online: data.gouv.fr is asked about the shown stations only (their position, which still reveals your area to within a few km). Local file: the whole file (about 120 MB) is downloaded once a week and matched on your server; no position is sent. Off: no prices.",
+          "charging_entity": "For example a car or companion app charging sensor. When set, the \"Hide station\" buttons only work while it is on, so they are not pressed while driving."
+        }
+      },
+      "reauth_confirm": {
+        "title": "New TomTom API key",
+        "description": "TomTom rejected the stored API key (revoked, rotated or expired). Enter a new one.",
+        "data": {
+          "api_key": "API key"
+        },
+        "data_description": {
+          "api_key": "Stored in Home Assistant only, never logged."
         }
       }
     },
@@ -38,7 +50,8 @@
       "no_position": "Select at least one position source."
     },
     "abort": {
-      "single_instance_allowed": "RavitBornes is already configured."
+      "single_instance_allowed": "RavitBornes is already configured.",
+      "reauth_successful": "The API key was updated."
     }
   },
   "options": {
@@ -52,7 +65,8 @@
           "connectors": "Compatible connectors",
           "profile": "Charging profile",
           "excluded": "Hidden stations",
-          "tariffs": "Prices (France)"
+          "tariffs": "Prices (France)",
+          "charging_entity": "Charging (optional)"
         },
         "data_description": {
           "position_entities": "Phone and/or car trackers. The most recently updated one is used. Nothing is looked up while it is at home.",
@@ -60,7 +74,8 @@
           "connectors": "Only stations with at least one of these connectors are shown.",
           "profile": "Highway: fast DC charging close to the road. Visit: any charger close to where you stop.",
           "excluded": "Untick a station to show it again.",
-          "tariffs": "Approximate price per kWh from the national IRVE open data. Online: data.gouv.fr is asked about the shown stations only (their position, which still reveals your area to within a few km). Local file: the whole file (about 120 MB) is downloaded once a week and matched on your server; no position is sent. Off: no prices."
+          "tariffs": "Approximate price per kWh from the national IRVE open data. Online: data.gouv.fr is asked about the shown stations only (their position, which still reveals your area to within a few km). Local file: the whole file (about 120 MB) is downloaded once a week and matched on your server; no position is sent. Off: no prices.",
+          "charging_entity": "For example a car or companion app charging sensor. When set, the \"Hide station\" buttons only work while it is on, so they are not pressed while driving."
         }
       }
     },
@@ -109,6 +124,11 @@
       "exclude_station": {
         "name": "Hide station {index}"
       }
+    }
+  },
+  "exceptions": {
+    "not_charging": {
+      "message": "Stations can only be hidden while the car is charging."
     }
   }
 }

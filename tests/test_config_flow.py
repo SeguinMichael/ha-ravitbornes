@@ -131,3 +131,34 @@ async def test_options_flow_changes_settings(
 
     assert await hass.config_entries.async_unload(entry.entry_id)
     await hass.async_block_till_done()
+
+
+async def test_reauth_replaces_the_key(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+) -> None:
+    """A rejected new key is refused; a valid one replaces the stored key."""
+    entry = MockConfigEntry(
+        domain=DOMAIN, data={CONF_API_KEY: "revoked-key"}, options={**SETTINGS, CONF_TARIFFS: "off"}
+    )
+    entry.add_to_hass(hass)
+    result = await entry.start_reauth_flow(hass)
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "reauth_confirm"
+
+    aioclient_mock.get(NEARBY_URL, status=403)
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_API_KEY: "still-wrong"}
+    )
+    assert result["errors"] == {"base": "invalid_auth"}
+
+    aioclient_mock.clear_requests()
+    aioclient_mock.get(NEARBY_URL, json={"summary": {}, "results": []})
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_API_KEY: FAKE_KEY}
+    )
+    await hass.async_block_till_done()
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reauth_successful"
+    assert entry.data == {CONF_API_KEY: FAKE_KEY}
+    assert entry.options == {**SETTINGS, CONF_TARIFFS: "off"}  # settings kept
+

@@ -1,10 +1,12 @@
 """End-to-end tests: car position -> TomTom -> station sensors."""
 
+from datetime import timedelta
 import logging
 
+from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.config_entries import ConfigEntryState
+from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
 from homeassistant.const import ATTR_LATITUDE, ATTR_LONGITUDE, CONF_API_KEY, STATE_UNKNOWN
 from homeassistant.core import HomeAssistant
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -183,10 +185,18 @@ async def test_quota_on_availability_keeps_partial_results(
     await _unload(hass, entry)
 
 
-async def test_rejected_key_retries_setup(
+def _reauth_flows(hass: HomeAssistant) -> list:
+    return [
+        flow
+        for flow in hass.config_entries.flow.async_progress()
+        if flow["context"]["source"] == SOURCE_REAUTH
+    ]
+
+
+async def test_rejected_key_asks_for_a_new_one(
     hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
 ) -> None:
-    """If TomTom rejects the key, setup is retried later instead of crashing."""
+    """If TomTom rejects the key at startup, Home Assistant asks for a new key."""
     _set_position(hass, 45.1, 4.2)
     aioclient_mock.get(NEARBY_URL, status=403)
     entry = MockConfigEntry(domain=DOMAIN, data={CONF_API_KEY: "fakekey"}, options=OPTIONS)
@@ -195,4 +205,26 @@ async def test_rejected_key_retries_setup(
     await hass.config_entries.async_setup(entry.entry_id)
     await hass.async_block_till_done()
 
-    assert entry.state is ConfigEntryState.SETUP_RETRY
+    assert entry.state is ConfigEntryState.SETUP_ERROR
+    assert len(_reauth_flows(hass)) == 1
+
+
+async def test_key_rejected_while_running_asks_for_a_new_one(
+    hass: HomeAssistant,
+    aioclient_mock: AiohttpClientMocker,
+    freezer: FrozenDateTimeFactory,
+) -> None:
+    """A key revoked later (availability call refused) also starts the reauth flow."""
+    _set_position(hass, 45.1, 4.2)
+    _mock_tomtom(aioclient_mock)
+    entry = await _setup(hass)
+    assert not _reauth_flows(hass)
+
+    aioclient_mock.clear_requests()
+    _mock_tomtom(aioclient_mock, slow_status=401)
+    freezer.tick(timedelta(minutes=4))  # cached availability expired
+    await _move(hass, 45.1027, 4.2)
+
+    assert hass.states.get(STATION_1).state == "unavailable"
+    assert len(_reauth_flows(hass)) == 1
+    await _unload(hass, entry)

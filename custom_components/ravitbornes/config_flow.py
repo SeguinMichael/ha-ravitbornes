@@ -29,6 +29,7 @@ from homeassistant.helpers.selector import (
 
 from .api import TomTomAuthError, TomTomClient, TomTomError, TomTomQuotaError
 from .const import (
+    CONF_CHARGING_ENTITY,
     CONF_CONNECTORS,
     CONF_EXCLUDED,
     CONF_POSITION_ENTITIES,
@@ -66,6 +67,10 @@ def _settings_fields(defaults: Mapping[str, Any]) -> dict[Any, Any]:
         vol.Optional(
             CONF_TRIP_ENTITY,
             description={"suggested_value": defaults.get(CONF_TRIP_ENTITY)},
+        ): EntitySelector(EntitySelectorConfig(domain="binary_sensor")),
+        vol.Optional(
+            CONF_CHARGING_ENTITY,
+            description={"suggested_value": defaults.get(CONF_CHARGING_ENTITY)},
         ): EntitySelector(EntitySelectorConfig(domain="binary_sensor")),
         vol.Required(
             CONF_CONNECTORS,
@@ -132,24 +137,26 @@ class RavitBornesConfigFlow(ConfigFlow, domain=DOMAIN):
         """Settings can be changed later."""
         return RavitBornesOptionsFlow()
 
+    async def _validate_key(self, api_key: str) -> dict[str, str]:
+        """Errors of a key check (one minimal TomTom search), empty when valid."""
+        try:
+            await TomTomClient(async_get_clientsession(self.hass), api_key).validate_key()
+        except TomTomAuthError:
+            return {"base": "invalid_auth"}
+        except TomTomQuotaError:
+            return {"base": "quota_exceeded"}
+        except TomTomError:
+            return {"base": "cannot_connect"}
+        return {}
+
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Handle the API key step."""
         errors: dict[str, str] = {}
         if user_input is not None:
-            client = TomTomClient(
-                async_get_clientsession(self.hass), user_input[CONF_API_KEY]
-            )
-            try:
-                await client.validate_key()
-            except TomTomAuthError:
-                errors["base"] = "invalid_auth"
-            except TomTomQuotaError:
-                errors["base"] = "quota_exceeded"
-            except TomTomError:
-                errors["base"] = "cannot_connect"
-            else:
+            errors = await self._validate_key(user_input[CONF_API_KEY])
+            if not errors:
                 self._api_key = user_input[CONF_API_KEY]
                 return await self.async_step_settings()
 
@@ -175,6 +182,29 @@ class RavitBornesConfigFlow(ConfigFlow, domain=DOMAIN):
             step_id="settings",
             data_schema=vol.Schema(_settings_fields(user_input or {})),
             errors=errors,
+        )
+
+
+    async def async_step_reauth(
+        self, entry_data: Mapping[str, Any]
+    ) -> ConfigFlowResult:
+        """TomTom rejected the stored key (revoked, rotated, expired)."""
+        return await self.async_step_reauth_confirm()
+
+    async def async_step_reauth_confirm(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Ask for a new key, check it, then reload with it."""
+        errors: dict[str, str] = {}
+        if user_input is not None:
+            errors = await self._validate_key(user_input[CONF_API_KEY])
+            if not errors:
+                return self.async_update_reload_and_abort(
+                    self._get_reauth_entry(),
+                    data_updates={CONF_API_KEY: user_input[CONF_API_KEY]},
+                )
+        return self.async_show_form(
+            step_id="reauth_confirm", data_schema=STEP_USER_DATA_SCHEMA, errors=errors
         )
 
 

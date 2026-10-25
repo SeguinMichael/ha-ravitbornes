@@ -8,11 +8,11 @@ from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.const import CONF_API_KEY
 from homeassistant.core import HomeAssistant
 
-from .const import CONF_POSITION_ENTITIES, CONF_TRIP_ENTITY
+from .const import CONF_CHARGING_ENTITY, CONF_POSITION_ENTITIES, CONF_TRIP_ENTITY
 from .coordinator import RavitBornesConfigEntry
 
 # Entity ids often contain a person's or phone's name.
-TO_REDACT = {CONF_API_KEY, CONF_POSITION_ENTITIES, CONF_TRIP_ENTITY}
+TO_REDACT = {CONF_API_KEY, CONF_POSITION_ENTITIES, CONF_TRIP_ENTITY, CONF_CHARGING_ENTITY}
 
 
 async def async_get_config_entry_diagnostics(

@@ -19,14 +19,26 @@
           "trip_entity": "Trajet en cours (facultatif)",
           "connectors": "Connecteurs compatibles",
           "profile": "Profil de recharge",
-          "tariffs": "Tarifs (France)"
+          "tariffs": "Tarifs (France)",
+          "charging_entity": "En charge (facultatif)"
         },
         "data_description": {
           "position_entities": "Trackers du téléphone et/ou de la voiture. Le plus récemment mis à jour est utilisé. Aucune recherche n'est faite tant qu'il est à la maison.",
           "trip_entity": "Par exemple le capteur Android Auto du companion app. Tant qu'il est allumé, la disponibilité est rafraîchie toutes les 3 minutes, même à l'arrêt ; éteint, aucune recherche automatique (le bouton « Rechercher des bornes (30 min) » reste utilisable).",
           "connectors": "Seules les bornes ayant au moins un de ces connecteurs sont affichées.",
           "profile": "Autoroute : recharge rapide DC près de la route. Visite : toute borne proche de l'endroit où vous vous arrêtez.",
-          "tariffs": "Prix approximatif au kWh tiré des données ouvertes nationales IRVE. En ligne : data.gouv.fr est interrogé sur les seules bornes affichées (leur position, qui situe tout de même votre zone à quelques km près). Fichier local : le fichier complet (environ 120 Mo) est téléchargé une fois par semaine et rapproché sur votre serveur ; aucune position n'est envoyée. Désactivé : pas de tarif."
+          "tariffs": "Prix approximatif au kWh tiré des données ouvertes nationales IRVE. En ligne : data.gouv.fr est interrogé sur les seules bornes affichées (leur position, qui situe tout de même votre zone à quelques km près). Fichier local : le fichier complet (environ 120 Mo) est téléchargé une fois par semaine et rapproché sur votre serveur ; aucune position n'est envoyée. Désactivé : pas de tarif.",
+          "charging_entity": "Par exemple un capteur de recharge de la voiture ou du companion app. S'il est choisi, les boutons « Masquer la borne » ne fonctionnent que lorsqu'il est allumé, pour ne pas être utilisés en roulant."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Nouvelle clé API TomTom",
+        "description": "TomTom a refusé la clé API enregistrée (révoquée, changée ou expirée). Saisissez-en une nouvelle.",
+        "data": {
+          "api_key": "Clé API"
+        },
+        "data_description": {
+          "api_key": "Stockée uniquement dans Home Assistant, jamais journalisée."
         }
       }
     },
@@ -38,7 +50,8 @@
       "no_position": "Sélectionnez au moins une source de position."
     },
     "abort": {
-      "single_instance_allowed": "RavitBornes est déjà configuré."
+      "single_instance_allowed": "RavitBornes est déjà configuré.",
+      "reauth_successful": "La clé API a été mise à jour."
     }
   },
   "options": {
@@ -52,7 +65,8 @@
           "connectors": "Connecteurs compatibles",
           "profile": "Profil de recharge",
           "excluded": "Bornes masquées",
-          "tariffs": "Tarifs (France)"
+          "tariffs": "Tarifs (France)",
+          "charging_entity": "En charge (facultatif)"
         },
         "data_description": {
           "position_entities": "Trackers du téléphone et/ou de la voiture. Le plus récemment mis à jour est utilisé. Aucune recherche n'est faite tant qu'il est à la maison.",
@@ -60,7 +74,8 @@
           "connectors": "Seules les bornes ayant au moins un de ces connecteurs sont affichées.",
           "profile": "Autoroute : recharge rapide DC près de la route. Visite : toute borne proche de l'endroit où vous vous arrêtez.",
           "excluded": "Décochez une borne pour l'afficher à nouveau.",
-          "tariffs": "Prix approximatif au kWh tiré des données ouvertes nationales IRVE. En ligne : data.gouv.fr est interrogé sur les seules bornes affichées (leur position, qui situe tout de même votre zone à quelques km près). Fichier local : le fichier complet (environ 120 Mo) est téléchargé une fois par semaine et rapproché sur votre serveur ; aucune position n'est envoyée. Désactivé : pas de tarif."
+          "tariffs": "Prix approximatif au kWh tiré des données ouvertes nationales IRVE. En ligne : data.gouv.fr est interrogé sur les seules bornes affichées (leur position, qui situe tout de même votre zone à quelques km près). Fichier local : le fichier complet (environ 120 Mo) est téléchargé une fois par semaine et rapproché sur votre serveur ; aucune position n'est envoyée. Désactivé : pas de tarif.",
+          "charging_entity": "Par exemple un capteur de recharge de la voiture ou du companion app. S'il est choisi, les boutons « Masquer la borne » ne fonctionnent que lorsqu'il est allumé, pour ne pas être utilisés en roulant."
         }
       }
     },
@@ -109,6 +124,11 @@
       "exclude_station": {
         "name": "Masquer la borne {index}"
       }
+    }
+  },
+  "exceptions": {
+    "not_charging": {
+      "message": "Les bornes ne peuvent être masquées que pendant la recharge."
     }
   }
 }

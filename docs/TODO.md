@@ -8,11 +8,11 @@
 - **Durée de cache autorisée par les CGU TomTom** : non précisée publiquement ; cache court retenu. À confirmer auprès du support si un cache long devient utile.
 - **Durcissement GitHub** (côté interface, à faire par l'utilisateur sur ordinateur) : règle sur `main` (pas de force-push ni de suppression, Tests et Security obligatoires) ; CodeQL en configuration par défaut ; relever les réglages Actions → General (la validation a échoué au démarrage le 2026-10-25 après la bascule en public). Les SHA de `hassfest` et `hacs/action` suivent une branche, pas une version : Dependabot ne les mettra peut-être pas à jour (non vérifié), les rafraîchir à la main de temps en temps.
 
-- **Ré-authentification** : si TomTom refuse la clé en cours d'usage, les capteurs deviennent indisponibles sans proposer de ressaisir la clé (flux `reauth` à ajouter).
 - **Zones denses** : atténué par le filtrage côté TomTom (connecteurs, puissance) ; en profil visite (AC, sans plancher), 50 résultats peuvent encore ne pas couvrir tout le rayon.
 - **Doublons à deux identifiants de disponibilité** (même opérateur, ~10 m, connecteurs différents) : un seul site listé deux fois, ou deux bornes distinctes ? Selon la réponse, fusionner en additionnant les disponibilités ou garder les deux lignes. Aujourd'hui, la seconde disponibilité est perdue.
 - **Tarifs TomTom** : aucune API tarifaire dans l'offre libre-service TomTom constatée à ce jour (la notion n'apparaît que dans l'offre automobile sous contrat) ; l'« EV Search API » n'est pas dans le périmètre de la clé d'évaluation, son contenu n'a pas été vérifié. Décision 2026-10-25 : source tarifaire interchangeable, TomTom si la clé le permet, IRVE sinon (voir `conception.md`). L'IRVE est en place ; la source TomTom reste à faire, faute de clé pour la tester.
 - **Consolidation IRVE du PAN encore en bêta** : colonnes et règles susceptibles de changer ; le mode local refuse un fichier sans les colonnes attendues (avertissement dans le journal), le mode en ligne renverrait simplement aucun prix. Surveiller.
+- **Capteur « en charge »** : le sélecteur n'accepte que des `binary_sensor` allumés pendant la recharge ; vérifier au mini-spike Android Auto quel capteur le companion app ou la voiture fournit réellement (s'il s'agit d'un `sensor` à états, il faudra l'accepter).
 - **Mode local, à valider en vrai** : séparateur et booléens du vrai CSV, temps de lecture et mémoire sur Raspberry Pi.
 - **Qualité des tarifs IRVE** : champ texte libre, souvent vide ; seul « x €/kWh » est lu. Mesurer sur de vrais trajets la part de bornes avec prix, et le décalage avec le prix réel (contrat eMSP).
 - **Toucher une ligne → confirmation → guidage** (demande utilisateur, 2026-10-25) : à valider au mini-spike Android Auto (écran « Navigation » du companion app, confirmation ou non ; sinon notification voiture avec action « Y aller »).
@@ -23,7 +23,6 @@
 
 Le companion app expose, pendant une session Android Auto, des capteurs voiture (`car_battery` en %, `car_range_remaining` en m, `car_charging_status`…) ; les intégrations constructeur en exposent d'autres. Pistes, chacune comme entité facultative à choisir dans la configuration :
 
-- **Garde « en charge »** pour le bouton « Masquer » (décision utilisateur : à faire) — n'accepter l'appui que pendant une recharge, pour la sécurité au volant.
 - **Seuil de batterie** : déclencher la notification voiture sous X %.
 - **Autonomie restante** : écarter les bornes hors de portée (surtout utile avec le corridor).
 - **En charge** : suspendre les rafraîchissements pendant la recharge (économie de quota).

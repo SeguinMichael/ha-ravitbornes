@@ -23,7 +23,7 @@ Pris par Claude pendant que l'utilisateur était absent (« avance au maximum sa
 | Domicile | État `home` : aucun appel, liste vidée | `coordinator.py` |
 | Liste des bornes | Par zone arrondie (~1 km) et profil, 6 h ; rayon de recherche = rayon du profil + 1 km ; 50 résultats max | `coordinator.py` |
 | Disponibilité | Seulement pour les 6 bornes affichées ; 3 min | `coordinator.py` |
-| Quota / réseau | Résultats partiels (« inconnu ») + avertissement ; clé refusée → capteurs indisponibles | `coordinator.py` |
+| Quota / réseau | Résultats partiels (« inconnu ») + avertissement ; clé refusée → capteurs indisponibles et ressaisie de la clé proposée | `coordinator.py` |
 | Capteurs | 6 « Borne N » ; état `Nom · kW · km · x/y libres` ; grisé = « complet » en texte (provisoire) ; attributs lat/lon de la borne | `sensor.py`, `display.py` |
 | Langue des états | Français si HA est en français, sinon anglais | `display.py` |
 | Diagnostics | Clé et entités (position, trajet) masquées, aucune coordonnée ; bornes masquées : nombre seulement | `diagnostics.py` |

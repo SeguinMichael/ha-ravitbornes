@@ -3,18 +3,20 @@
 - "Search stations (30 min)": look up now and every 3 min for 30 min, even
   outside a trip or at home.
 - "Hide station N": hide the station shown in a slot (bad experience, crowded,
-  hard to reach...). In practice pressed while charging; gating it on the
-  car's charging state is in docs/TODO.md.
+  hard to reach...). In practice pressed while charging: with a charging
+  entity configured, it only works while that entity is on (safety at the wheel).
 """
 
 from __future__ import annotations
 
 from homeassistant.components.button import ButtonEntity
-from homeassistant.core import HomeAssistant
+from homeassistant.core import Event, EventStateChangedData, HomeAssistant, callback
+from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import STATION_SLOTS
+from .const import DOMAIN, STATION_SLOTS
 from .coordinator import RavitBornesConfigEntry, RavitBornesCoordinator
 from .entity import device_info
 
@@ -77,13 +79,33 @@ class ExcludeStationButton(CoordinatorEntity[RavitBornesCoordinator], ButtonEnti
         self._attr_translation_placeholders = {"index": str(index)}
         self._attr_device_info = device_info(entry_id)
 
+    async def async_added_to_hass(self) -> None:
+        """Follow the charging entity, which makes the button (un)available."""
+        await super().async_added_to_hass()
+        if charging_entity := self.coordinator.charging_entity:
+            self.async_on_remove(
+                async_track_state_change_event(
+                    self.hass, [charging_entity], self._async_charging_changed
+                )
+            )
+
+    @callback
+    def _async_charging_changed(self, _event: Event[EventStateChangedData]) -> None:
+        self.async_write_ha_state()
+
     @property
     def available(self) -> bool:
-        """Only when a station is shown in this slot."""
-        return super().available and self.coordinator.station_at(self._index) is not None
+        """Only when a station is shown in this slot (and, if configured, while charging)."""
+        return (
+            super().available
+            and self.coordinator.hiding_allowed
+            and self.coordinator.station_at(self._index) is not None
+        )
 
     async def async_press(self) -> None:
         """Hide the station and refresh the list."""
+        if not self.coordinator.hiding_allowed:
+            raise HomeAssistantError(translation_domain=DOMAIN, translation_key="not_charging")
         item = self.coordinator.station_at(self._index)
         if item is not None:
             await self.coordinator.async_exclude(item.station)
