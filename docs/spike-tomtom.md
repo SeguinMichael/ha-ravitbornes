@@ -65,9 +65,18 @@ TomTom peut-il être la source principale de disponibilité temps réel, en usag
 - **Doublons ambigus** : deux entrées du même opérateur à ~10 m, **chacune avec son identifiant de disponibilité** et des connecteurs différents → le dédoublonnage en garde une, la disponibilité de l'autre est perdue. Voir TODO.
 - **Noms peu lisibles** : 6 bornes sur 10 portent le même nom long d'opérateur public (tronqué, identique d'une ligne à l'autre). Voir TODO.
 
+### IRVE dynamique vs TomTom (2026-10-25)
+
+Question : l'IRVE (statique + dynamique, open data) pourrait-elle remplacer TomTom ?
+
+- L'**IRVE statique** donne position, prises, puissance et **tarif** (texte libre, souvent vide), mais **pas la disponibilité** ; France seulement ; qualité inégale (coordonnées non vérifiées pour certains opérateurs, données d'un grand réseau figées depuis mars 2026 selon le suivi qualité du PAN).
+- L'**IRVE dynamique** (consolidation nationale du PAN, obligation AFIR) : suivi qualité du PAN au 2026-10-09 — part des points avec un statut de moins de 30 min : **0 %** pour Izivia, Aldi, Qovoltis, Electra ; 19 % Ionity ; 47 % Tesla. Flux GIREVE **figé depuis le 2026-06-15** (33 606 points). Une intégration domotique tierce qui l'utilise constate qu'à peine plus de la moitié des points publics d'une grande ville ont un état.
+- **TomTom sur ces mêmes réseaux** (ville moyenne d'Île-de-France) : Electra 300 kW → 3 libres / 1 occupée ; Izivia 150 kW → 4/4 libres ; aucun statut « inconnu ». Les statuts sont renseignés là où l'IRVE dynamique n'a rien. Limite : sans horodatage, la fraîcheur n'est pas prouvée (une prise occupée chez Electra suggère une donnée vivante) → Q3, comparaison avec l'appli de l'opérateur au même instant.
+- **Conclusion** : **TomTom reste la source de disponibilité** ; l'IRVE statique sert aux **tarifs**. L'IRVE dynamique pourra être réévaluée comme source complémentaire si sa couverture progresse.
+
 ## Reste à faire
 
-Q2 (couverture des aires, DC, EVzen), Q3, Q4 mesuré, Q5, Q6.
+Q2 (EVzen, aire multi-réseaux dont Tesla), Q3 (fraîcheur : comparer avec l'appli d'un opérateur au même instant), Q4 mesuré, Q5 (croisement IRVE pour les tarifs), Q6.
 
 ## Livrable
 
