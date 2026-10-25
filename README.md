@@ -8,10 +8,10 @@ Home Assistant integration that finds **available EV charging stations** around 
 
 ## How it works
 
-1. Your phone's position is read from a Home Assistant entity (companion app `device_tracker` or `person`). Nothing is looked up while you are at home.
-2. When the car has moved, the integration asks **TomTom** for charging stations around you and for their **real-time availability** (free / occupied / out of service, per connector type and power level).
+1. The car's position is read from one or more Home Assistant entities (phone and/or car `device_tracker`, or `person`); the most recently updated one wins. Nothing is looked up while you are at home.
+2. When the car has moved — and, if you select a *trip* entity such as the companion app's Android Auto sensor, every 3 minutes while it is on, even when stopped — the integration asks **TomTom** for charging stations around you and for their **real-time availability** (free / occupied / out of service, per connector type and power level).
 3. Stations are filtered for your car's connectors and a charging profile — **highway** (DC, 50 kW or more, within 5 km) or **visit** (any power, within 2 km) — and ordered by distance.
-4. The 6 nearest are exposed as sensors **Station 1…6**, e.g. `Ionity · 150 kW · 1.2 km · 3/6 free` (or `full` when no compatible connector is free). Each carries the station's latitude / longitude, so you can **navigate to it from Android Auto**.
+4. The 6 nearest are exposed as sensors **Station 1…6**, e.g. `Ionity · 150 kW · 1.2 km · 3/6 free` (or `full` when no compatible connector is free). Each carries the station's latitude / longitude, so you can **navigate to it from Android Auto**. A **Hide station N** button removes a station you do not want (bad experience, crowded, hard to reach…); hidden stations are kept on your Home Assistant only and can be shown again from the integration options.
 
 Planned: a car notification for good opportunities, search along the route, approximate prices.
 
@@ -25,7 +25,7 @@ Planned: a car notification for good opportunities, search along the route, appr
 
 1. HACS → ⋮ → *Custom repositories* → add `https://github.com/SeguinMichael/ha-ravitbornes` as an **Integration**.
 2. Install **RavitBornes**, restart Home Assistant.
-3. *Settings → Devices & services → Add integration → RavitBornes*, enter your TomTom API key, then choose the position entity, your car's connectors and the charging profile (changeable later in the integration options).
+3. *Settings → Devices & services → Add integration → RavitBornes*, enter your TomTom API key, then choose the position sources, an optional trip entity, your car's connectors and the charging profile (changeable later in the integration options).
 
 ## Privacy and security
 

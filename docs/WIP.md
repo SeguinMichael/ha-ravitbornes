@@ -60,6 +60,10 @@ Scripts jetables dans `spikes/` ; seules les conclusions sont versionnées.
 - Score v1 (`scoring.py`) : tri par distance, profil en filtre, borne sans prise compatible libre grisée.
 - Entités : 6 capteurs « Borne 1…6 » (état textuel court, attributs `latitude` / `longitude`, puissance, dispo).
 
+## 5 bis. Trajet, positions, bornes masquées
+
+> **Fait le 2026-10-25** (décisions utilisateur, voir `conception.md`) : rafraîchissement toutes les 3 min tant qu'Android Auto est connecté, position la plus récente parmi plusieurs sources, boutons « Masquer la borne N » avec liste persistante. Suite prévue en TODO : garde « en charge » sur le bouton, métriques du véhicule (batterie, autonomie).
+
 ## 6. Prochaines étapes (ordre proposé)
 
 1. **Installer** l'intégration sur une instance HA réelle (HACS, dépôt personnalisé) et vérifier configuration, capteurs, journaux — premier test hors CI.

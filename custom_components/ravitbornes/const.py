@@ -2,9 +2,12 @@
 
 DOMAIN = "ravitbornes"
 
-CONF_POSITION_ENTITY = "position_entity"
+CONF_POSITION_ENTITIES = "position_entities"
+CONF_TRIP_ENTITY = "trip_entity"
 CONF_CONNECTORS = "connectors"
 CONF_PROFILE = "profile"
+# Options-flow field only; the exclusion list itself lives in the HA store.
+CONF_EXCLUDED = "excluded"
 
 # Option key -> TomTom connector type (keys must be snake_case for translations).
 CONNECTORS = {

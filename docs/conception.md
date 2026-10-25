@@ -17,19 +17,25 @@ Pris par Claude pendant que l'utilisateur était absent (« avance au maximum sa
 
 | Sujet | Choix | Où |
 |---|---|---|
-| Configuration | 2ᵉ étape du config flow + options modifiables : entité de position, connecteurs, profil | `config_flow.py` |
+| Configuration | 2ᵉ étape du config flow + options modifiables : sources de position, entité de trajet, connecteurs, profil | `config_flow.py` |
 | Défauts | Connecteurs CCS Combo 2 + prise Type 2 + câble Type 2 ; profil autoroute | `const.py` |
-| Déclenchement | Sur changement de position uniquement (pas de minuterie), si déplacement ≥ 200 m ; anti-rebond 1 min | `coordinator.py` |
+| Déclenchement | Sur changement de position, si déplacement ≥ 200 m ; anti-rebond 1 min ; **plus** toutes les 3 min pendant le trajet (décision du 2026-10-25 ci-dessous) | `coordinator.py` |
 | Domicile | État `home` : aucun appel, liste vidée | `coordinator.py` |
 | Liste des bornes | Par zone arrondie (~1 km) et profil, 6 h ; rayon de recherche = rayon du profil + 1 km ; 50 résultats max | `coordinator.py` |
 | Disponibilité | Seulement pour les 6 bornes affichées ; 3 min | `coordinator.py` |
 | Quota / réseau | Résultats partiels (« inconnu ») + avertissement ; clé refusée → capteurs indisponibles | `coordinator.py` |
 | Capteurs | 6 « Borne N » ; état `Nom · kW · km · x/y libres` ; grisé = « complet » en texte (provisoire) ; attributs lat/lon de la borne | `sensor.py`, `display.py` |
 | Langue des états | Français si HA est en français, sinon anglais | `display.py` |
-| Diagnostics | Clé et entité de position masquées, aucune coordonnée | `diagnostics.py` |
+| Diagnostics | Clé et entités (position, trajet) masquées, aucune coordonnée ; bornes masquées : nombre seulement | `diagnostics.py` |
 | Puissance du véhicule | Non demandée (inutile avec le tri par distance) | — |
 
-Limites connues : pas de flux de ré-authentification ; à l'arrêt (pas de déplacement), la disponibilité n'est plus rafraîchie ; en zone très dense, 50 résultats peuvent ne pas couvrir tout le rayon.
+Limites connues : pas de flux de ré-authentification ; en zone très dense, 50 résultats peuvent ne pas couvrir tout le rayon ; sans entité de trajet, la disponibilité n'est pas rafraîchie à l'arrêt.
+
+## Décisions de l'utilisateur (2026-10-25)
+
+- **Trajet = Android Auto connecté.** Entité de trajet facultative (ex. `binary_sensor.<téléphone>_android_auto` du companion app). Allumée : rafraîchissement **toutes les 3 min, même à l'arrêt**, en plus des déplacements. Éteinte : aucun appel, liste vidée. Absente : comportement par déplacement seul. *(Choix d'implémentation : avec l'entité configurée, les déplacements hors trajet ne déclenchent rien.)*
+- **Position la plus à jour.** Plusieurs sources possibles (téléphone, voiture…) ; on retient celle **rapportée le plus récemment** (`last_reported`, qui avance même si la valeur ne change pas). La règle « à la maison » s'applique à cette source. *Limite : HA n'émet pas d'événement de changement quand une source renvoie la même valeur ; si une source redevient la plus récente sans bouger, la bascule se fait au rafraîchissement suivant.*
+- **Bornes masquées.** Bouton « Masquer la borne N » par emplacement, **accessible au volant** (en pratique utilisé pendant la charge ; garde « véhicule en charge » en TODO). Liste **persistante** dans `.storage` du HA (`ravitbornes.<entry>.excluded`), jamais envoyée ailleurs, supprimée avec l'intégration. Une borne masquée est reconnue par son ID TomTom **ou** par sa position (≤ 25 m, si l'ID change). On démasque dans les options (liste cochée, nom + adresse).
 
 ## Entrée et vie privée (décision 2026-10-24)
 

@@ -12,7 +12,7 @@ from pytest_homeassistant_custom_component.test_util.aiohttp import AiohttpClien
 from custom_components.ravitbornes.api import BASE_URL
 from custom_components.ravitbornes.const import (
     CONF_CONNECTORS,
-    CONF_POSITION_ENTITY,
+    CONF_POSITION_ENTITIES,
     CONF_PROFILE,
     DOMAIN,
 )
@@ -20,7 +20,7 @@ from custom_components.ravitbornes.const import (
 FAKE_KEY = "test-api-key-not-real"
 NEARBY_URL = f"{BASE_URL}/nearbySearch/.json"
 SETTINGS = {
-    CONF_POSITION_ENTITY: "device_tracker.test_phone",
+    CONF_POSITION_ENTITIES: ["device_tracker.test_phone"],
     CONF_CONNECTORS: ["ccs2", "type2_outlet"],
     CONF_PROFILE: "highway",
 }

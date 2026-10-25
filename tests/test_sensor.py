@@ -13,7 +13,7 @@ from pytest_homeassistant_custom_component.test_util.aiohttp import AiohttpClien
 from custom_components.ravitbornes.api import BASE_URL
 from custom_components.ravitbornes.const import (
     CONF_CONNECTORS,
-    CONF_POSITION_ENTITY,
+    CONF_POSITION_ENTITIES,
     CONF_PROFILE,
     DOMAIN,
 )
@@ -26,7 +26,7 @@ AVAILABILITY_URL = f"{BASE_URL}/chargingAvailability.json"
 PARK_A = "00000000-0000-4000-8000-000000000001"
 SLOW = "00000000-0000-4000-8000-000000000004"
 OPTIONS = {
-    CONF_POSITION_ENTITY: TRACKER,
+    CONF_POSITION_ENTITIES: [TRACKER],
     CONF_CONNECTORS: ["type2_outlet"],
     CONF_PROFILE: "visit",
 }

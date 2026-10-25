@@ -25,6 +25,7 @@ def test_parse_stations_aggregates_plugs() -> None:
         ConnectorGroup("StandardHouseholdCountrySpecific", 2.0, "AC1", 1),
     }
     assert park.max_power_kw == 22.0
+    assert park.address == "1 Example Street, 00000 Exampleville"
 
 
 def test_parse_stations_keeps_dc_and_missing_availability() -> None:

@@ -11,13 +11,13 @@ from typing import Any
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.const import ATTR_LATITUDE, ATTR_LONGITUDE
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN, STATION_SLOTS
+from .const import STATION_SLOTS
 from .coordinator import RavitBornesConfigEntry, RavitBornesCoordinator
 from .display import format_station
+from .entity import device_info
 from .scoring import RankedStation
 
 # Data comes from the coordinator: no parallel update limit needed.
@@ -49,16 +49,11 @@ class StationSensor(CoordinatorEntity[RavitBornesCoordinator], SensorEntity):
         self._index = index
         self._attr_unique_id = f"{entry_id}_station_{index}"
         self._attr_translation_placeholders = {"index": str(index)}
-        self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, entry_id)},
-            name="RavitBornes",
-            entry_type=DeviceEntryType.SERVICE,
-        )
+        self._attr_device_info = device_info(entry_id)
 
     @property
     def _item(self) -> RankedStation | None:
-        data = self.coordinator.data or []
-        return data[self._index - 1] if len(data) >= self._index else None
+        return self.coordinator.station_at(self._index)
 
     @property
     def native_value(self) -> str | None:

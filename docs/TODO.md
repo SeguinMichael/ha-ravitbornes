@@ -11,10 +11,18 @@
 - **Durcissement CI** : épingler les actions GitHub par SHA plutôt que par tag ; activer côté GitHub le *secret scanning* et la *push protection* (gratuits sur dépôt public).
 
 - **Ré-authentification** : si TomTom refuse la clé en cours d'usage, les capteurs deviennent indisponibles sans proposer de ressaisir la clé (flux `reauth` à ajouter).
-- **Détection du trajet** : le capteur « Android Auto connecté » du companion app pourrait servir de déclencheur (rafraîchir aussi à l'arrêt, en voiture) plutôt que le seul déplacement.
 - **Zones denses** : 50 résultats de recherche peuvent ne pas couvrir tout le rayon ; à mesurer (spike Q2).
 
 ## Évolutions envisagées
+
+### Métriques du véhicule (idées de l'utilisateur, 2026-10-25)
+
+Le companion app expose, pendant une session Android Auto, des capteurs voiture (`car_battery` en %, `car_range_remaining` en m, `car_charging_status`…) ; les intégrations constructeur en exposent d'autres. Pistes, chacune comme entité facultative à choisir dans la configuration :
+
+- **Garde « en charge »** pour le bouton « Masquer » (décision utilisateur : à faire) — n'accepter l'appui que pendant une recharge, pour la sécurité au volant.
+- **Seuil de batterie** : déclencher la notification voiture sous X %.
+- **Autonomie restante** : écarter les bornes hors de portée (surtout utile avec le corridor).
+- **En charge** : suspendre les rafraîchissements pendant la recharge (économie de quota).
 
 - **Tarifs** : croisement avec le fichier consolidé IRVE (data.gouv.fr) par coordonnées GPS ; précision approximative assumée (le prix réel dépend du contrat eMSP). TomTom ne fournit pas de tarifs en libre-service.
 - **Score v2** : temps d'accès réel en minutes via Matrix Routing (un appel pour les 10-15 meilleurs candidats), métrique « temps total perdu = détour + temps de charge » sur autoroute.

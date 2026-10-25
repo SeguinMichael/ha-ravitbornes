@@ -31,6 +31,7 @@ class Station:
     longitude: float
     connectors: tuple[ConnectorGroup, ...]
     availability_id: str | None
+    address: str = ""
 
     @property
     def max_power_kw(self) -> float:
@@ -92,6 +93,7 @@ def parse_stations(payload: dict[str, Any]) -> list[Station]:
                     .get("chargingAvailability", {})
                     .get("id")
                 ),
+                address=(result.get("address") or {}).get("freeformAddress", ""),
             )
         )
     return stations

@@ -13,14 +13,16 @@
       },
       "settings": {
         "title": "Vehicle and position",
-        "description": "Choose where the car's position comes from and which connectors the car accepts.",
+        "description": "Choose where the car's position comes from, how a trip is detected and which connectors the car accepts.",
         "data": {
-          "position_entity": "Position entity",
+          "position_entities": "Position sources",
+          "trip_entity": "Trip in progress (optional)",
           "connectors": "Compatible connectors",
           "profile": "Charging profile"
         },
         "data_description": {
-          "position_entity": "Device tracker or person from the Home Assistant companion app. Nothing is looked up while it is at home.",
+          "position_entities": "Phone and/or car trackers. The most recently updated one is used. Nothing is looked up while it is at home.",
+          "trip_entity": "For example the companion app's Android Auto sensor. While it is on, availability is refreshed every 3 minutes, even when the car is stopped; while it is off, nothing is looked up.",
           "connectors": "Only stations with at least one of these connectors are shown.",
           "profile": "Highway: fast DC charging close to the road. Visit: any charger close to where you stop."
         }
@@ -30,7 +32,8 @@
       "invalid_auth": "TomTom rejected this API key.",
       "quota_exceeded": "The TomTom quota or rate limit is reached. Try again later.",
       "cannot_connect": "Cannot reach TomTom. Check the connection and try again.",
-      "no_connector": "Select at least one connector."
+      "no_connector": "Select at least one connector.",
+      "no_position": "Select at least one position source."
     },
     "abort": {
       "single_instance_allowed": "RavitBornes is already configured."
@@ -40,21 +43,26 @@
     "step": {
       "init": {
         "title": "Vehicle and position",
-        "description": "Choose where the car's position comes from and which connectors the car accepts.",
+        "description": "Choose where the car's position comes from, how a trip is detected and which connectors the car accepts.",
         "data": {
-          "position_entity": "Position entity",
+          "position_entities": "Position sources",
+          "trip_entity": "Trip in progress (optional)",
           "connectors": "Compatible connectors",
-          "profile": "Charging profile"
+          "profile": "Charging profile",
+          "excluded": "Hidden stations"
         },
         "data_description": {
-          "position_entity": "Device tracker or person from the Home Assistant companion app. Nothing is looked up while it is at home.",
+          "position_entities": "Phone and/or car trackers. The most recently updated one is used. Nothing is looked up while it is at home.",
+          "trip_entity": "For example the companion app's Android Auto sensor. While it is on, availability is refreshed every 3 minutes, even when the car is stopped; while it is off, nothing is looked up.",
           "connectors": "Only stations with at least one of these connectors are shown.",
-          "profile": "Highway: fast DC charging close to the road. Visit: any charger close to where you stop."
+          "profile": "Highway: fast DC charging close to the road. Visit: any charger close to where you stop.",
+          "excluded": "Untick a station to show it again."
         }
       }
     },
     "error": {
-      "no_connector": "Select at least one connector."
+      "no_connector": "Select at least one connector.",
+      "no_position": "Select at least one position source."
     }
   },
   "selector": {
@@ -81,6 +89,11 @@
     "sensor": {
       "station": {
         "name": "Station {index}"
+      }
+    },
+    "button": {
+      "exclude_station": {
+        "name": "Hide station {index}"
       }
     }
   }

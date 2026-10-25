@@ -4,6 +4,11 @@
       "station": {
         "default": "mdi:ev-station"
       }
+    },
+    "button": {
+      "exclude_station": {
+        "default": "mdi:eye-off"
+      }
     }
   }
 }

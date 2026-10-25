@@ -19,6 +19,7 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.selector import (
     EntitySelector,
     EntitySelectorConfig,
+    SelectOptionDict,
     SelectSelector,
     SelectSelectorConfig,
     TextSelector,
@@ -29,13 +30,16 @@ from homeassistant.helpers.selector import (
 from .api import TomTomAuthError, TomTomClient, TomTomError, TomTomQuotaError
 from .const import (
     CONF_CONNECTORS,
-    CONF_POSITION_ENTITY,
+    CONF_EXCLUDED,
+    CONF_POSITION_ENTITIES,
     CONF_PROFILE,
+    CONF_TRIP_ENTITY,
     CONNECTORS,
     DEFAULT_CONNECTORS,
     DEFAULT_PROFILE,
     DOMAIN,
 )
+from .exclusions import ExcludedStation
 from .scoring import PROFILES
 
 STEP_USER_DATA_SCHEMA = vol.Schema(
@@ -47,42 +51,66 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
 )
 
 
-def _settings_schema(defaults: Mapping[str, Any]) -> vol.Schema:
-    """Vehicle and position settings, shared by the config and options flows."""
-    return vol.Schema(
-        {
-            vol.Required(
-                CONF_POSITION_ENTITY,
-                description={"suggested_value": defaults.get(CONF_POSITION_ENTITY)},
-            ): EntitySelector(EntitySelectorConfig(domain=["device_tracker", "person"])),
-            vol.Required(
-                CONF_CONNECTORS,
-                default=list(defaults.get(CONF_CONNECTORS, DEFAULT_CONNECTORS)),
-            ): SelectSelector(
-                SelectSelectorConfig(
-                    options=list(CONNECTORS),
-                    multiple=True,
-                    translation_key=CONF_CONNECTORS,
-                )
-            ),
-            vol.Required(
-                CONF_PROFILE, default=defaults.get(CONF_PROFILE, DEFAULT_PROFILE)
-            ): SelectSelector(
-                SelectSelectorConfig(options=list(PROFILES), translation_key=CONF_PROFILE)
-            ),
-        }
-    )
+def _settings_fields(defaults: Mapping[str, Any]) -> dict[Any, Any]:
+    """Position, trip and vehicle settings, shared by the config and options flows."""
+    return {
+        vol.Required(
+            CONF_POSITION_ENTITIES,
+            description={"suggested_value": defaults.get(CONF_POSITION_ENTITIES)},
+        ): EntitySelector(
+            EntitySelectorConfig(domain=["device_tracker", "person"], multiple=True)
+        ),
+        vol.Optional(
+            CONF_TRIP_ENTITY,
+            description={"suggested_value": defaults.get(CONF_TRIP_ENTITY)},
+        ): EntitySelector(EntitySelectorConfig(domain="binary_sensor")),
+        vol.Required(
+            CONF_CONNECTORS,
+            default=list(defaults.get(CONF_CONNECTORS, DEFAULT_CONNECTORS)),
+        ): SelectSelector(
+            SelectSelectorConfig(
+                options=list(CONNECTORS), multiple=True, translation_key=CONF_CONNECTORS
+            )
+        ),
+        vol.Required(
+            CONF_PROFILE, default=defaults.get(CONF_PROFILE, DEFAULT_PROFILE)
+        ): SelectSelector(
+            SelectSelectorConfig(options=list(PROFILES), translation_key=CONF_PROFILE)
+        ),
+    }
+
+
+def _excluded_field(excluded: list[ExcludedStation]) -> dict[Any, Any]:
+    """Hidden stations, all ticked: untick one to show it again."""
+    if not excluded:
+        return {}
+    return {
+        vol.Optional(CONF_EXCLUDED, default=[item.poi_id for item in excluded]): SelectSelector(
+            SelectSelectorConfig(
+                options=[
+                    SelectOptionDict(
+                        value=item.poi_id,
+                        label=f"{item.name} — {item.address}" if item.address else item.name,
+                    )
+                    for item in excluded
+                ],
+                multiple=True,
+            )
+        )
+    }
 
 
 def _validate_settings(user_input: Mapping[str, Any]) -> dict[str, str]:
-    """At least one connector is needed, otherwise nothing can ever match."""
+    """A position source and a connector are needed, otherwise nothing can work."""
+    if not user_input.get(CONF_POSITION_ENTITIES):
+        return {CONF_POSITION_ENTITIES: "no_position"}
     if not user_input.get(CONF_CONNECTORS):
         return {CONF_CONNECTORS: "no_connector"}
     return {}
 
 
 class RavitBornesConfigFlow(ConfigFlow, domain=DOMAIN):
-    """Ask for the user's own TomTom API key, then for the vehicle settings."""
+    """Ask for the user's own TomTom API key, then for the settings."""
 
     VERSION = 1
 
@@ -93,7 +121,7 @@ class RavitBornesConfigFlow(ConfigFlow, domain=DOMAIN):
     @staticmethod
     @callback
     def async_get_options_flow(config_entry: ConfigEntry) -> RavitBornesOptionsFlow:
-        """Vehicle settings can be changed later."""
+        """Settings can be changed later."""
         return RavitBornesOptionsFlow()
 
     async def async_step_user(
@@ -124,7 +152,7 @@ class RavitBornesConfigFlow(ConfigFlow, domain=DOMAIN):
     async def async_step_settings(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Handle the vehicle and position step."""
+        """Handle the position and vehicle step."""
         errors: dict[str, str] = {}
         if user_input is not None:
             errors = _validate_settings(user_input)
@@ -137,26 +165,37 @@ class RavitBornesConfigFlow(ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id="settings",
-            data_schema=_settings_schema(user_input or {}),
+            data_schema=vol.Schema(_settings_fields(user_input or {})),
             errors=errors,
         )
 
 
 class RavitBornesOptionsFlow(OptionsFlow):
-    """Change the vehicle and position settings."""
+    """Change the settings and show hidden stations again."""
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Show the settings form, prefilled with the current options."""
+        coordinator = getattr(self.config_entry, "runtime_data", None)
+        excluded = coordinator.exclusions.items if coordinator else []
         errors: dict[str, str] = {}
         if user_input is not None:
             errors = _validate_settings(user_input)
             if not errors:
-                return self.async_create_entry(data=user_input)
+                options = dict(user_input)
+                if excluded:
+                    # Refreshes now: unchanged settings do not trigger a reload.
+                    await coordinator.async_keep_excluded(options.pop(CONF_EXCLUDED, []))
+                return self.async_create_entry(data=options)
 
         return self.async_show_form(
             step_id="init",
-            data_schema=_settings_schema(user_input or self.config_entry.options),
+            data_schema=vol.Schema(
+                {
+                    **_settings_fields(user_input or self.config_entry.options),
+                    **_excluded_field(excluded),
+                }
+            ),
             errors=errors,
         )

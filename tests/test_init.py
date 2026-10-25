@@ -8,7 +8,7 @@ from pytest_homeassistant_custom_component.test_util.aiohttp import AiohttpClien
 
 from custom_components.ravitbornes.const import (
     CONF_CONNECTORS,
-    CONF_POSITION_ENTITY,
+    CONF_POSITION_ENTITIES,
     CONF_PROFILE,
     DOMAIN,
     STATION_SLOTS,
@@ -23,7 +23,7 @@ async def test_setup_and_unload(
         domain=DOMAIN,
         data={CONF_API_KEY: "test-api-key-not-real"},
         options={
-            CONF_POSITION_ENTITY: "device_tracker.not_there_yet",
+            CONF_POSITION_ENTITIES: ["device_tracker.not_there_yet"],
             CONF_CONNECTORS: ["ccs2"],
             CONF_PROFILE: "highway",
         },
