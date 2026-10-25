@@ -71,3 +71,14 @@ Scripts jetables dans `spikes/` ; seules les conclusions sont versionnées.
 2. **Mini-spike Android Auto** (chantier 1) sur les vrais capteurs : favoris, navigation vers `latitude` / `longitude`, lisibilité du texte, rendu de « complet ».
 3. Recaler les choix pris en autonomie (seuils, défauts) selon ces essais.
 4. Spike TomTom Q2 à Q6, puis recherche le long d'un itinéraire.
+
+## Tarifs IRVE : option de configuration (décidé le 2026-10-25)
+
+Décisions de l'utilisateur (2026-10-25) :
+
+- Option **Tarifs** dans la configuration : *Désactivé* / *En ligne* / *Fichier local* ; **par défaut En ligne**.
+- *En ligne* : API tabulaire data.gouv.fr autour des bornes affichées (comportement actuel), basculée sur la ressource du PAN (consolidation bêta, `4ca78c71-4ea4-475d-bd3a-d4aef88f7bf8`) si elle offre la même API — à vérifier par l'utilisateur (le proxy de la session n'atteint pas l'API).
+- *Fichier local* : CSV statique du PAN (121 Mo) **retéléchargé chaque semaine**, rapprochement fait sur le serveur HA, aucune position envoyée. Lecture en flux et conservation des seules colonnes utiles, pour ménager un Raspberry Pi.
+- *Désactivé* : aucun appel IRVE.
+- Les deux sources doivent quitter l'ancienne ressource data.gouv.fr avant sa suppression le 2026-12-31.
+

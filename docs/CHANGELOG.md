@@ -32,3 +32,4 @@
 - CI : actions épinglées par SHA (commentaire de version à côté), pour qu'un tag ou une branche déplacé chez un tiers ne change pas le code exécuté.
 - Icône originale (épingle de carte et éclair) dans `custom_components/ravitbornes/brand/` (256 et 512 px), exigée par la validation HACS. README : statut « preuve de concept, jamais testée de bout en bout » (demande utilisateur). Description et topics du dépôt à saisir par l'utilisateur (écriture des réglages refusée par le proxy de la session).
 - Description et topics saisis par l'utilisateur : validation HACS **verte** pour la première fois (10/10). Réglage Actions corrigé (seules les actions du propriétaire étaient autorisées) : actions GitHub et liste nommée, SHA obligatoire.
+- Décision utilisateur : tarifs IRVE en option (désactivé / en ligne / fichier local, défaut en ligne ; fichier hebdomadaire). Chantier planifié dans `WIP.md`.
