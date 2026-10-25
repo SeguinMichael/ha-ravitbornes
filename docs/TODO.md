@@ -6,7 +6,6 @@
 - **Notification voiture** : déclenchée par l'intégration elle-même, ou par un *blueprint* d'automatisation fourni à côté ? (à trancher après le mini-spike Android Auto)
 - **Quota de l'API de disponibilité TomTom** : non communiqué pour l'offre d'évaluation ; la journalisation des appels donnera la consommation réelle (décision 2026-10-24 : on avance sans le connaître).
 - **Durée de cache autorisée par les CGU TomTom** : non précisée publiquement ; cache court retenu. À confirmer auprès du support si un cache long devient utile.
-- **Icône / brand** de l'intégration pour HA et HACS.
 - **Durcissement GitHub** (côté interface, à faire par l'utilisateur sur ordinateur) : règle sur `main` (pas de force-push ni de suppression, Tests et Security obligatoires) ; CodeQL en configuration par défaut ; relever les réglages Actions → General (la validation a échoué au démarrage le 2026-10-25 après la bascule en public). Les SHA de `hassfest` et `hacs/action` suivent une branche, pas une version : Dependabot ne les mettra peut-être pas à jour (non vérifié), les rafraîchir à la main de temps en temps.
 
 - **Ré-authentification** : si TomTom refuse la clé en cours d'usage, les capteurs deviennent indisponibles sans proposer de ressaisir la clé (flux `reauth` à ajouter).

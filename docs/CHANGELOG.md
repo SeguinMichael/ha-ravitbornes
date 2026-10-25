@@ -30,3 +30,4 @@
 - Licence **MIT** (décision utilisateur, 2026-10-25), préférée à Apache 2.0 : plus simple et plus courante dans HACS ; la concession de brevets d'Apache n'a pas d'enjeu ici.
 - Dépôt passé en **public** par l'utilisateur ; historique vérifié avant (ni clé, ni position réelle, ni e-mail personnel). Secret scanning, push protection, correctifs Dependabot et signalement privé de vulnérabilités actifs.
 - CI : actions épinglées par SHA (commentaire de version à côté), pour qu'un tag ou une branche déplacé chez un tiers ne change pas le code exécuté.
+- Icône originale (épingle de carte et éclair) dans `custom_components/ravitbornes/brand/` (256 et 512 px), exigée par la validation HACS. README : statut « preuve de concept, jamais testée de bout en bout » (demande utilisateur). Description et topics du dépôt à saisir par l'utilisateur (écriture des réglages refusée par le proxy de la session).

@@ -4,7 +4,7 @@
 
 Home Assistant integration that finds **available EV charging stations** around your car while you drive, and surfaces them on **Android Auto** through the Home Assistant companion app.
 
-> ⚠️ **Status: pre-alpha.** The whole chain is implemented and covered by automated tests, but it has **not yet been tried on a real Home Assistant instance nor in a car**. See [docs/WIP.md](docs/WIP.md) for the roadmap.
+> ⚠️ **Status: proof of concept, never tested end to end.** The whole chain is implemented and covered by automated tests, but it has **not yet been tried on a real Home Assistant instance nor in a car**. See [docs/WIP.md](docs/WIP.md) for the roadmap.
 
 ## How it works
 

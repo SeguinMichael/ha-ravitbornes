@@ -4,7 +4,7 @@
 
 Intégration Home Assistant qui repère les **bornes de recharge disponibles** autour de la voiture pendant le trajet, et les affiche dans **Android Auto** via le companion app Home Assistant.
 
-> ⚠️ **État : pré-alpha.** Toute la chaîne est en place et couverte par des tests automatiques, mais elle n'a **pas encore été essayée sur une vraie instance Home Assistant ni en voiture**. Feuille de route : [docs/WIP.md](docs/WIP.md).
+> ⚠️ **État : preuve de concept (POC), jamais testée de bout en bout.** Toute la chaîne est en place et couverte par des tests automatiques, mais elle n'a **pas encore été essayée sur une vraie instance Home Assistant ni en voiture**. Feuille de route : [docs/WIP.md](docs/WIP.md).
 
 ## Fonctionnement
 
