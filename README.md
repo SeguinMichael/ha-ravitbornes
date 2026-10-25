@@ -31,7 +31,7 @@ Planned: a car notification for good opportunities, search along the route.
 
 - Your API key is stored in the Home Assistant config entry and is never written to logs.
 - Your position is **rounded to a coarse area** before any call to an external API: TomTom receives a zone, not your exact location.
-- For prices, data.gouv.fr receives the position of the **shown stations** only (at most 6, then cached for a day), never yours.
+- For prices, data.gouv.fr receives the position of the **shown stations** (at most 6, then cached for a day), not yours; since they are near you, they still reveal your area to within a few kilometres, like the zone sent to TomTom.
 - All calls are made from your Home Assistant server, never from your phone. No call is made while you are at home, unless you press *Search stations*.
 - Diagnostics (for bug reports) contain neither your key, nor your position entity, nor any coordinates.
 

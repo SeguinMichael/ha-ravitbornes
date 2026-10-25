@@ -31,7 +31,7 @@ Prévu : une notification voiture sur opportunité, la recherche le long de l'it
 
 - La clé API est stockée dans l'entrée de configuration Home Assistant et n'est jamais écrite dans les journaux.
 - La position est **arrondie à une zone** avant tout appel à une API externe : TomTom reçoit une zone, pas la position exacte.
-- Pour les tarifs, data.gouv.fr reçoit la position des **bornes affichées** seulement (6 au plus, puis cache d'une journée), jamais la vôtre.
+- Pour les tarifs, data.gouv.fr reçoit la position des **bornes affichées** (6 au plus, puis cache d'une journée), pas la vôtre ; comme elles sont proches de vous, elles situent tout de même votre zone à quelques kilomètres près, comme la zone envoyée à TomTom.
 - Tous les appels partent du serveur Home Assistant, jamais du téléphone. Aucun appel n'est fait quand vous êtes à la maison, sauf si vous appuyez sur *Rechercher des bornes*.
 - Les diagnostics (pour signaler un bug) ne contiennent ni la clé, ni l'entité de position, ni aucune coordonnée.
 
