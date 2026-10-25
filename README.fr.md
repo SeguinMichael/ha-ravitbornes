@@ -47,3 +47,7 @@ Les documents de travail (`docs/`) sont en français. Lancer les tests :
 pip install -r requirements_test.txt
 pytest
 ```
+
+## Licence
+
+[MIT](LICENSE).

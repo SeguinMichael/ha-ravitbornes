@@ -47,3 +47,7 @@ Internal working documents (`docs/`) are written in French. Run the tests with:
 pip install -r requirements_test.txt
 pytest
 ```
+
+## License
+
+[MIT](LICENSE).

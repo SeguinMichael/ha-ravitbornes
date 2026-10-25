@@ -6,7 +6,6 @@
 - **Notification voiture** : déclenchée par l'intégration elle-même, ou par un *blueprint* d'automatisation fourni à côté ? (à trancher après le mini-spike Android Auto)
 - **Quota de l'API de disponibilité TomTom** : non communiqué pour l'offre d'évaluation ; la journalisation des appels donnera la consommation réelle (décision 2026-10-24 : on avance sans le connaître).
 - **Durée de cache autorisée par les CGU TomTom** : non précisée publiquement ; cache court retenu. À confirmer auprès du support si un cache long devient utile.
-- **Licence** du dépôt : à choisir (sans licence, le code public reste « tous droits réservés »).
 - **Icône / brand** de l'intégration pour HA et HACS.
 - **Durcissement CI** : épingler les actions GitHub par SHA plutôt que par tag ; activer côté GitHub le *secret scanning* et la *push protection* (gratuits sur dépôt public).
 
