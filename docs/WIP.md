@@ -74,10 +74,12 @@ Scripts jetables dans `spikes/` ; seules les conclusions sont versionnées.
 
 ## Tarifs IRVE : option de configuration (décidé le 2026-10-25)
 
+> **Fait le 2026-10-25.** Voir `FONCTIONNEMENT.md`. Reste à valider sur une vraie installation : téléchargement et lecture du vrai CSV (séparateur, booléens), durée et mémoire sur Raspberry Pi.
+
 Décisions de l'utilisateur (2026-10-25) :
 
 - Option **Tarifs** dans la configuration : *Désactivé* / *En ligne* / *Fichier local* ; **par défaut En ligne**.
-- *En ligne* : API tabulaire data.gouv.fr autour des bornes affichées (comportement actuel), basculée sur la ressource du PAN (consolidation bêta, `4ca78c71-4ea4-475d-bd3a-d4aef88f7bf8`) si elle offre la même API — à vérifier par l'utilisateur (le proxy de la session n'atteint pas l'API).
+- *En ligne* : API tabulaire data.gouv.fr autour des bornes affichées (comportement actuel), basculée sur la ressource du PAN (consolidation bêta, `4ca78c71-4ea4-475d-bd3a-d4aef88f7bf8`) : l'API tabulaire y répond, avec les mêmes colonnes (vérifié par l'utilisateur le 2026-10-25, 177 738 points de charge) ; le filtre par boîte n'y a pas été essayé.
 - *Fichier local* : CSV statique du PAN (121 Mo) **retéléchargé chaque semaine**, rapprochement fait sur le serveur HA, aucune position envoyée. Lecture en flux et conservation des seules colonnes utiles, pour ménager un Raspberry Pi.
 - *Désactivé* : aucun appel IRVE.
 - Les deux sources doivent quitter l'ancienne ressource data.gouv.fr avant sa suppression le 2026-12-31.

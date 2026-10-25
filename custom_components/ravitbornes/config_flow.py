@@ -33,11 +33,14 @@ from .const import (
     CONF_EXCLUDED,
     CONF_POSITION_ENTITIES,
     CONF_PROFILE,
+    CONF_TARIFFS,
     CONF_TRIP_ENTITY,
     CONNECTORS,
     DEFAULT_CONNECTORS,
     DEFAULT_PROFILE,
+    DEFAULT_TARIFFS,
     DOMAIN,
+    TARIFF_SOURCES,
 )
 from .exclusions import ExcludedStation
 from .scoring import PROFILES
@@ -76,6 +79,11 @@ def _settings_fields(defaults: Mapping[str, Any]) -> dict[Any, Any]:
             CONF_PROFILE, default=defaults.get(CONF_PROFILE, DEFAULT_PROFILE)
         ): SelectSelector(
             SelectSelectorConfig(options=list(PROFILES), translation_key=CONF_PROFILE)
+        ),
+        vol.Required(
+            CONF_TARIFFS, default=defaults.get(CONF_TARIFFS, DEFAULT_TARIFFS)
+        ): SelectSelector(
+            SelectSelectorConfig(options=TARIFF_SOURCES, translation_key=CONF_TARIFFS)
         ),
     }
 

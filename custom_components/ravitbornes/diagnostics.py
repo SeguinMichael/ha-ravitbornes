@@ -31,4 +31,6 @@ async def async_get_config_entry_diagnostics(
         "statuses": sorted(item.status.value for item in stations),
         # Which stations a user hides says something about their habits: count only.
         "excluded_stations": len(coordinator.exclusions.items),
+        "tariff_source": coordinator.tariff_source,
+        "local_irve": coordinator.local_irve.status if coordinator.local_irve else None,
     }

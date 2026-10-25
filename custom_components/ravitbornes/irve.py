@@ -4,8 +4,9 @@ TomTom gives no price. The IRVE static file has a free-text `tarification`
 field per charge point. There is no key shared with TomTom, but TomTom uses
 the IRVE coordinates for French stations, so stations are matched by position.
 
-Only the position of a shown *station* is sent (a ~30 m box around it), never
-the car's position.
+Two sources (option "tariffs", decision 2026-10-25): the online tabular API,
+asked about each shown *station* (a ~30 m box around it, never the car), or
+a weekly local copy of the whole file (see irve_file.py), which sends nothing.
 """
 
 from __future__ import annotations
@@ -14,7 +15,7 @@ from collections.abc import Callable, Iterable
 from dataclasses import dataclass, replace
 import logging
 import re
-from typing import Any
+from typing import Any, Protocol
 
 import aiohttp
 
@@ -24,10 +25,9 @@ from .scoring import RankedStation
 
 _LOGGER = logging.getLogger(__name__)
 
-# Consolidated IRVE file on data.gouv.fr, queried through the tabular API.
-# This dataset is announced as replaced by the transport.data.gouv.fr
-# consolidation and kept until 2026-12-31: see docs/TODO.md.
-IRVE_RESOURCE_ID = "eb76d20a-8501-400e-b336-d85724de5435"
+# Static IRVE consolidation of the national access point (transport.data.gouv.fr,
+# still "beta"), which replaces the data.gouv.fr file deleted on 2026-12-31.
+IRVE_RESOURCE_ID = "4ca78c71-4ea4-475d-bd3a-d4aef88f7bf8"
 IRVE_URL = f"https://tabular-api.data.gouv.fr/api/resources/{IRVE_RESOURCE_ID}/data/"
 # ~30 m around the station (latitude), a bit wider in longitude for France.
 BOX_LAT = 0.0003
@@ -69,7 +69,7 @@ class IrveStation:
         return min(self.prices, key=lambda item: abs(item[0] - power_kw))[1]
 
 
-def parse_irve_rows(rows: list[dict[str, Any]]) -> list[IrveStation]:
+def parse_irve_rows(rows: Iterable[dict[str, Any]]) -> list[IrveStation]:
     """Group charge point rows by station and keep the readable prices."""
     grouped: dict[str, dict[str, Any]] = {}
     for row in rows:
@@ -103,7 +103,14 @@ def nearest_station(
 
 
 class IrveError(Exception):
-    """The IRVE API could not be used (prices are then simply left out)."""
+    """The IRVE data could not be used (prices are then simply left out)."""
+
+
+class IrveSource(Protocol):
+    """Where the IRVE station at a given position is looked up."""
+
+    async def station_at(self, latitude: float, longitude: float) -> IrveStation | None:
+        """The IRVE station at a station position, if any; IrveError if unknown."""
 
 
 class IrveClient:
@@ -138,8 +145,8 @@ class IrveClient:
 class TariffLookup:
     """Adds IRVE prices to the shown stations, with a per-station daily cache."""
 
-    def __init__(self, client: IrveClient, clock: Callable[[], float]) -> None:
-        """Initialize with a client and the clock used by the other caches."""
+    def __init__(self, client: IrveSource, clock: Callable[[], float]) -> None:
+        """Initialize with an IRVE source and the clock used by the other caches."""
         self._client = client
         # Wrapped in a tuple so that "no IRVE station here" is cached too.
         self._cache: TTLCache[tuple[IrveStation | None]] = TTLCache(TARIFF_TTL_S, clock)

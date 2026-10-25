@@ -6,6 +6,14 @@ CONF_POSITION_ENTITIES = "position_entities"
 CONF_TRIP_ENTITY = "trip_entity"
 CONF_CONNECTORS = "connectors"
 CONF_PROFILE = "profile"
+# Where approximate prices come from (decision 2026-10-25): nowhere, the IRVE
+# online API around the shown stations, or a weekly local copy of the IRVE file.
+CONF_TARIFFS = "tariffs"
+TARIFFS_OFF = "off"
+TARIFFS_ONLINE = "online"
+TARIFFS_LOCAL = "local"
+TARIFF_SOURCES = [TARIFFS_OFF, TARIFFS_ONLINE, TARIFFS_LOCAL]
+DEFAULT_TARIFFS = TARIFFS_ONLINE
 # Options-flow field only; the exclusion list itself lives in the HA store.
 CONF_EXCLUDED = "excluded"
 

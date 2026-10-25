@@ -14,6 +14,7 @@ from custom_components.ravitbornes.const import (
     CONF_CONNECTORS,
     CONF_POSITION_ENTITIES,
     CONF_PROFILE,
+    CONF_TARIFFS,
     DOMAIN,
 )
 
@@ -49,7 +50,8 @@ async def test_user_flow_creates_entry(
     assert result["type"] is FlowResultType.CREATE_ENTRY
     assert result["title"] == "RavitBornes"
     assert result["data"] == {CONF_API_KEY: FAKE_KEY}
-    assert result["options"] == SETTINGS
+    # Prices default to the light online lookup (decision 2026-10-25).
+    assert result["options"] == {**SETTINGS, CONF_TARIFFS: "online"}
 
 
 @pytest.mark.parametrize(
@@ -118,7 +120,7 @@ async def test_options_flow_changes_settings(
     assert result["type"] is FlowResultType.FORM
     assert result["step_id"] == "init"
 
-    new_settings = {**SETTINGS, CONF_PROFILE: "visit"}
+    new_settings = {**SETTINGS, CONF_PROFILE: "visit", CONF_TARIFFS: "off"}
     result = await hass.config_entries.options.async_configure(
         result["flow_id"], new_settings
     )

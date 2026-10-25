@@ -15,10 +15,7 @@
    "implantation_station": "Parking privé à usage public",
    "adresse_station": "1 Example Street",
    "code_insee_commune": "00000",
-   "coordonneesXY": [
-    4.2,
-    45.1
-   ],
+   "coordonneesXY": "[4.2, 45.1]",
    "nbre_pdc": 2,
    "id_pdc_itinerance": "FREXAPE00000001",
    "id_pdc_local": "FR*EXA*E00000001",
@@ -45,18 +42,15 @@
    "observations": "Payment via the store app",
    "date_maj": "2025-12-11",
    "cable_t2_attache": false,
-   "last_modified": "2025-12-17T10:36:45.669+01:00",
-   "datagouv_dataset_id": "000000000000000000000000",
-   "datagouv_resource_id": "00000000-0000-4000-8000-000000000000",
-   "datagouv_organization_or_owner": "example",
-   "created_at": "2025-02-25T11:44:24.715+01:00",
    "consolidated_longitude": 4.2,
    "consolidated_latitude": 45.1,
-   "consolidated_code_postal": "00000",
-   "consolidated_commune": "Exampleville",
    "consolidated_is_lon_lat_correct": true,
-   "consolidated_is_code_insee_verified": true,
-   "consolidated_is_code_insee_modified": true
+   "datagouv_dataset_id": "000000000000000000000000",
+   "datagouv_resource_id": "00000000-0000-4000-8000-000000000000",
+   "dataset_title": "Example charge point dataset",
+   "datagouv_organization_or_owner": "example",
+   "datagouv_last_modified": "2026-10-24T06:40:07+02:00",
+   "deduplication_status": "unique"
   },
   {
    "__id": 1002,
@@ -73,10 +67,7 @@
    "implantation_station": "Parking privé à usage public",
    "adresse_station": "1 Example Street",
    "code_insee_commune": "00000",
-   "coordonneesXY": [
-    4.2,
-    45.1
-   ],
+   "coordonneesXY": "[4.2, 45.1]",
    "nbre_pdc": 2,
    "id_pdc_itinerance": "FREXAPE00000002",
    "id_pdc_local": "FR*EXA*E00000002",
@@ -103,18 +94,15 @@
    "observations": "Payment via the store app",
    "date_maj": "2025-12-11",
    "cable_t2_attache": false,
-   "last_modified": "2025-12-17T10:36:45.669+01:00",
-   "datagouv_dataset_id": "000000000000000000000000",
-   "datagouv_resource_id": "00000000-0000-4000-8000-000000000000",
-   "datagouv_organization_or_owner": "example",
-   "created_at": "2025-02-25T11:44:24.715+01:00",
    "consolidated_longitude": 4.2,
    "consolidated_latitude": 45.1,
-   "consolidated_code_postal": "00000",
-   "consolidated_commune": "Exampleville",
    "consolidated_is_lon_lat_correct": true,
-   "consolidated_is_code_insee_verified": true,
-   "consolidated_is_code_insee_modified": true
+   "datagouv_dataset_id": "000000000000000000000000",
+   "datagouv_resource_id": "00000000-0000-4000-8000-000000000000",
+   "dataset_title": "Example charge point dataset",
+   "datagouv_organization_or_owner": "example",
+   "datagouv_last_modified": "2026-10-24T06:40:07+02:00",
+   "deduplication_status": "unique"
   },
   {
    "__id": 1003,
@@ -131,10 +119,7 @@
    "implantation_station": "Parking privé à usage public",
    "adresse_station": "71 Example Avenue 00000 Exampleville FRANCE",
    "code_insee_commune": null,
-   "coordonneesXY": [
-    4.203,
-    45.092
-   ],
+   "coordonneesXY": "[4.203, 45.092]",
    "nbre_pdc": 15,
    "id_pdc_itinerance": "FREXBPE00000003",
    "id_pdc_local": null,
@@ -161,18 +146,15 @@
    "observations": null,
    "date_maj": "2026-10-22",
    "cable_t2_attache": null,
-   "last_modified": "2026-10-22T19:00:10.447+02:00",
-   "datagouv_dataset_id": "000000000000000000000000",
-   "datagouv_resource_id": "00000000-0000-4000-8000-000000000000",
-   "datagouv_organization_or_owner": "example",
-   "created_at": "2025-08-13T15:39:08.57+02:00",
    "consolidated_longitude": 4.203,
    "consolidated_latitude": 45.092,
-   "consolidated_code_postal": null,
-   "consolidated_commune": null,
    "consolidated_is_lon_lat_correct": false,
-   "consolidated_is_code_insee_verified": false,
-   "consolidated_is_code_insee_modified": false
+   "datagouv_dataset_id": "000000000000000000000000",
+   "datagouv_resource_id": "00000000-0000-4000-8000-000000000000",
+   "dataset_title": "Example charge point dataset",
+   "datagouv_organization_or_owner": "example",
+   "datagouv_last_modified": "2026-10-24T06:40:07+02:00",
+   "deduplication_status": "unique"
   },
   {
    "__id": 1004,
@@ -189,10 +171,7 @@
    "implantation_station": "Parking privé à usage public",
    "adresse_station": "71 Example Avenue 00000 Exampleville FRANCE",
    "code_insee_commune": null,
-   "coordonneesXY": [
-    4.203,
-    45.092
-   ],
+   "coordonneesXY": "[4.203, 45.092]",
    "nbre_pdc": 15,
    "id_pdc_itinerance": "FREXBPE00000004",
    "id_pdc_local": null,
@@ -219,18 +198,15 @@
    "observations": null,
    "date_maj": "2026-10-22",
    "cable_t2_attache": null,
-   "last_modified": "2026-10-22T19:00:10.447+02:00",
-   "datagouv_dataset_id": "000000000000000000000000",
-   "datagouv_resource_id": "00000000-0000-4000-8000-000000000000",
-   "datagouv_organization_or_owner": "example",
-   "created_at": "2025-08-13T15:39:08.57+02:00",
    "consolidated_longitude": 4.203,
    "consolidated_latitude": 45.092,
-   "consolidated_code_postal": null,
-   "consolidated_commune": null,
    "consolidated_is_lon_lat_correct": false,
-   "consolidated_is_code_insee_verified": false,
-   "consolidated_is_code_insee_modified": false
+   "datagouv_dataset_id": "000000000000000000000000",
+   "datagouv_resource_id": "00000000-0000-4000-8000-000000000000",
+   "dataset_title": "Example charge point dataset",
+   "datagouv_organization_or_owner": "example",
+   "datagouv_last_modified": "2026-10-24T06:40:07+02:00",
+   "deduplication_status": "unique"
   }
  ]
 }
