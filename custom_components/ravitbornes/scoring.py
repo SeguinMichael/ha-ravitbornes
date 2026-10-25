@@ -52,6 +52,13 @@ class RankedStation:
     status: AvailabilityStatus
     # Power of the best compatible connector free right now (None if none is known free).
     free_power_kw: float | None = None
+    # Approximate price from the IRVE open data (France only); 0.0 = free of charge.
+    price_per_kwh: float | None = None
+
+    @property
+    def shown_power_kw(self) -> float:
+        """The power the display leads with (best free one if slower than the max)."""
+        return self.free_power_kw if self.free_power_kw is not None else self.power_kw
 
 
 def compatible_groups(

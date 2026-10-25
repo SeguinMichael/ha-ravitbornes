@@ -11,9 +11,9 @@ Home Assistant integration that finds **available EV charging stations** around 
 1. The car's position is read from one or more Home Assistant entities (phone and/or car `device_tracker`, or `person`); the most recently updated one wins. Nothing is looked up while you are at home.
 2. When the car has moved — and, if you select a *trip* entity such as the companion app's Android Auto sensor, every 3 minutes while it is on, even when stopped — the integration asks **TomTom** for charging stations around you and for their **real-time availability** (free / occupied / out of service, per connector type and power level).
 3. Stations are filtered for your car's connectors and a charging profile — **highway** (DC, 50 kW or more, within 5 km) or **visit** (any power, within 2 km) — and ordered by distance.
-4. The 6 nearest are exposed as sensors **Station 1…6**, e.g. `IONITY (A6, Rest Area) · 150 kW · 1.2 km · 3/6 free` (or `50 kW free (max 350)` when only slower connectors are free, or `full` when none is). Each carries the station's latitude / longitude, so you can **navigate to it from Android Auto**. A **Search stations (30 min)** button looks up now and every 3 minutes for 30 minutes, even outside a trip or at home. A **Hide station N** button removes a station you do not want (bad experience, crowded, hard to reach…); hidden stations are kept on your Home Assistant only and can be shown again from the integration options.
+4. The 6 nearest are exposed as sensors **Station 1…6**, e.g. `IONITY (A6, Rest Area) · 150 kW · 1.2 km · 3/6 free` (or `50 kW free (max 350)` when only slower connectors are free, or `full` when none is). In France, an **approximate price** is added when the national IRVE open data has a readable one, e.g. `· 0.29 €/kWh`; the actual price depends on your charging card or subscription. Each carries the station's latitude / longitude, so you can **navigate to it from Android Auto**. A **Search stations (30 min)** button looks up now and every 3 minutes for 30 minutes, even outside a trip or at home. A **Hide station N** button removes a station you do not want (bad experience, crowded, hard to reach…); hidden stations are kept on your Home Assistant only and can be shown again from the integration options.
 
-Planned: a car notification for good opportunities, search along the route, approximate prices.
+Planned: a car notification for good opportunities, search along the route.
 
 ## Requirements
 
@@ -31,6 +31,7 @@ Planned: a car notification for good opportunities, search along the route, appr
 
 - Your API key is stored in the Home Assistant config entry and is never written to logs.
 - Your position is **rounded to a coarse area** before any call to an external API: TomTom receives a zone, not your exact location.
+- For prices, data.gouv.fr receives the position of the **shown stations** only (at most 6, then cached for a day), never yours.
 - All calls are made from your Home Assistant server, never from your phone. No call is made while you are at home, unless you press *Search stations*.
 - Diagnostics (for bug reports) contain neither your key, nor your position entity, nor any coordinates.
 

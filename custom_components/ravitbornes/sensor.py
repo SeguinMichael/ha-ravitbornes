@@ -75,6 +75,7 @@ class StationSensor(CoordinatorEntity[RavitBornesCoordinator], SensorEntity):
             "distance_km": round(item.distance_m / 1000, 1),
             "power_kw": item.power_kw,
             "free_power_kw": item.free_power_kw,
+            "price_per_kwh": item.price_per_kwh,
             "available": item.available,
             "total": item.total,
             "status": item.status.value,

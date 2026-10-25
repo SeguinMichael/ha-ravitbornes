@@ -44,6 +44,7 @@ from .const import (
     DOMAIN,
 )
 from .exclusions import Exclusions
+from .irve import IrveClient, TariffLookup
 from .models import ConnectorAvailability, Station, dedupe_stations, distance_m
 from .scoring import PROFILES, ChargingProfile, RankedStation, rank_stations
 
@@ -96,6 +97,7 @@ class RavitBornesCoordinator(DataUpdateCoordinator[list[RankedStation]]):
         self._client = TomTomClient(
             async_get_clientsession(hass), entry.data[CONF_API_KEY]
         )
+        self._tariffs = TariffLookup(IrveClient(async_get_clientsession(hass)), _timestamp)
         self._stations: TTLCache[list[Station]] = TTLCache(STATIONS_TTL_S, _timestamp)
         self._availability: TTLCache[list[ConnectorAvailability]] = TTLCache(
             AVAILABILITY_TTL_S, _timestamp
@@ -264,7 +266,8 @@ class RavitBornesCoordinator(DataUpdateCoordinator[list[RankedStation]]):
         availability = await self._availability_for(candidates)
 
         self._last_position = position
-        return rank_stations(stations, availability, *position, connector_types, profile)
+        ranked = rank_stations(stations, availability, *position, connector_types, profile)
+        return await self._tariffs.with_prices(ranked)
 
     async def _stations_around(
         self,

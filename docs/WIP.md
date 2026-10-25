@@ -28,7 +28,7 @@ Détail et résultats déjà acquis : `spike-tomtom.md`. Questions restantes :
 - Q2 couverture sur trajets réels (dont bornes DC d'autoroute et réseau EVzen) ;
 - Q3 fraîcheur de la disponibilité (comparaison terrain) ;
 - Q4 coût réel en requêtes avec le cache ;
-- Q5 croisement avec l'IRVE (pour les tarifs) ;
+- Q5 croisement avec l'IRVE (pour les tarifs) : coordonnées identiques sur l'échantillon vérifié, rapprochement à 30 m en place (2026-10-25) ; reste à mesurer le taux de rapprochement sur de vrais trajets ;
 - Q6 chargement du corridor par *Along Route Search*.
 
 Scripts jetables dans `spikes/` ; seules les conclusions sont versionnées.

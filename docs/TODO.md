@@ -13,7 +13,9 @@
 - **Ré-authentification** : si TomTom refuse la clé en cours d'usage, les capteurs deviennent indisponibles sans proposer de ressaisir la clé (flux `reauth` à ajouter).
 - **Zones denses** : atténué par le filtrage côté TomTom (connecteurs, puissance) ; en profil visite (AC, sans plancher), 50 résultats peuvent encore ne pas couvrir tout le rayon.
 - **Doublons à deux identifiants de disponibilité** (même opérateur, ~10 m, connecteurs différents) : un seul site listé deux fois, ou deux bornes distinctes ? Selon la réponse, fusionner en additionnant les disponibilités ou garder les deux lignes. Aujourd'hui, la seconde disponibilité est perdue.
-- **Tarifs** : aucune API tarifaire dans l'offre libre-service TomTom constatée à ce jour (la notion n'apparaît que dans l'offre automobile sous contrat) ; l'« EV Search API » n'est pas dans le périmètre de la clé d'évaluation, son contenu n'a pas été vérifié. Décision 2026-10-25 : source tarifaire interchangeable, TomTom si la clé le permet, IRVE sinon (voir `conception.md`).
+- **Tarifs TomTom** : aucune API tarifaire dans l'offre libre-service TomTom constatée à ce jour (la notion n'apparaît que dans l'offre automobile sous contrat) ; l'« EV Search API » n'est pas dans le périmètre de la clé d'évaluation, son contenu n'a pas été vérifié. Décision 2026-10-25 : source tarifaire interchangeable, TomTom si la clé le permet, IRVE sinon (voir `conception.md`). L'IRVE est en place ; la source TomTom reste à faire, faute de clé pour la tester.
+- **Ressource IRVE en fin de vie** : le jeu data.gouv.fr utilisé (`IRVE_RESOURCE_ID` dans `irve.py`) est annoncé remplacé par la consolidation de transport.data.gouv.fr et maintenu jusqu'au **2026-12-31**. Basculer avant cette date (vérifier que l'API tabulaire et les noms de colonnes suivent).
+- **Qualité des tarifs IRVE** : champ texte libre, souvent vide ; seul « x €/kWh » est lu. Mesurer sur de vrais trajets la part de bornes avec prix, et le décalage avec le prix réel (contrat eMSP).
 - **Toucher une ligne → confirmation → guidage** (demande utilisateur, 2026-10-25) : à valider au mini-spike Android Auto (écran « Navigation » du companion app, confirmation ou non ; sinon notification voiture avec action « Y aller »).
 
 ## Évolutions envisagées
@@ -27,7 +29,6 @@ Le companion app expose, pendant une session Android Auto, des capteurs voiture 
 - **Autonomie restante** : écarter les bornes hors de portée (surtout utile avec le corridor).
 - **En charge** : suspendre les rafraîchissements pendant la recharge (économie de quota).
 
-- **Tarifs** : croisement avec le fichier consolidé IRVE (data.gouv.fr) par coordonnées GPS ; précision approximative assumée (le prix réel dépend du contrat eMSP). TomTom ne fournit pas de tarifs en libre-service.
 - **Score v2** : temps d'accès réel en minutes via Matrix Routing (un appel pour les 10-15 meilleurs candidats), métrique « temps total perdu = détour + temps de charge » sur autoroute.
 - **Sources multiples** (ex. concentrateur national IRVE dynamique de transport.data.gouv.fr) : justifierait une collecte asynchrone et un cache partagé type Redis.
 - **App Android Auto dédiée** (templates car-app) si la voie HA s'avère trop limitée ; synthèse technique dans `conception.md`.

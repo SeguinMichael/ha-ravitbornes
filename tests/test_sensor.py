@@ -17,6 +17,7 @@ from custom_components.ravitbornes.const import (
     CONF_PROFILE,
     DOMAIN,
 )
+from custom_components.ravitbornes.irve import IRVE_URL
 
 from .conftest import load_json_fixture
 
@@ -39,7 +40,13 @@ def _set_position(hass: HomeAssistant, lat: float, lon: float, state: str = "not
     hass.states.async_set(TRACKER, state, {ATTR_LATITUDE: lat, ATTR_LONGITUDE: lon})
 
 
-def _mock_tomtom(aioclient_mock: AiohttpClientMocker, slow_status: int = 200) -> None:
+def _mock_tomtom(
+    aioclient_mock: AiohttpClientMocker,
+    slow_status: int = 200,
+    irve: dict | None = None,
+) -> None:
+    """TomTom responses, plus the IRVE prices (none by default)."""
+    aioclient_mock.get(IRVE_URL, json=irve or {"data": []})
     aioclient_mock.get(
         AVAILABILITY_URL,
         params={"chargingAvailability": PARK_A},

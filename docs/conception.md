@@ -90,6 +90,15 @@ TomTom ne fournit pas de tarifs en libre-service. Le champ tarif de l'IRVE est m
 
 **Décision (2026-10-25)** : lors du chantier IRVE, prévoir les tarifs comme une source interchangeable — **TomTom** si la clé de l'utilisateur donne accès à une API tarifaire (ex. EV Search API ou offre sous contrat), **IRVE** sinon (repli).
 
+**Mise en œuvre IRVE (2026-10-25, proposition acceptée par l'utilisateur)** :
+
+- **Rapprochement par position** : pas d'identifiant commun TomTom / IRVE, mais TomTom reprend les coordonnées IRVE pour les bornes françaises (identiques sur l'échantillon vérifié). Tolérance 30 m (le dédoublonnage TomTom est à 25 m).
+- **Vie privée** : seule la position d'une **borne affichée** part vers data.gouv.fr (petite boîte autour d'elle), jamais celle de la voiture ; au plus 6 requêtes, puis cache 24 h par borne.
+- **API tabulaire** plutôt que le fichier complet (plusieurs dizaines de Mo) : pas de téléchargement ni de stockage local, au prix d'un appel par nouvelle borne.
+- **Prix affiché** : celui du point de charge dont la puissance est la plus proche de la puissance affichée ; seul un prix au kWh est retenu (le texte libre est trop varié pour le reste). France seulement (`countryCode`).
+- **Facultatif** : toute panne IRVE retire le prix, jamais la borne ; un échec n'est pas mis en cache (nouvel essai au rafraîchissement suivant).
+- Source TomTom tarifaire : non implémentée (aucune clé disponible pour la tester) ; `TariffLookup` est le point d'insertion prévu.
+
 ## Exposition dans la voiture (décision 2026-10-24)
 
 Voie retenue : **companion app HA dans Android Auto**. D'après sa documentation (non testé, voir mini-spike dans `WIP.md`) :

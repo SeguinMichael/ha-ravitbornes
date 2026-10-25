@@ -13,6 +13,7 @@ from custom_components.ravitbornes.const import (
     DOMAIN,
 )
 from custom_components.ravitbornes.diagnostics import async_get_config_entry_diagnostics
+from custom_components.ravitbornes.irve import IRVE_URL
 
 from .conftest import load_json_fixture
 
@@ -32,6 +33,7 @@ async def test_diagnostics_contain_no_key_and_no_position(
     aioclient_mock.get(
         f"{BASE_URL}/nearbySearch/.json", json=load_json_fixture("nearby_search.json")
     )
+    aioclient_mock.get(IRVE_URL, json={"data": []})
     entry = MockConfigEntry(
         domain=DOMAIN,
         data={CONF_API_KEY: API_KEY},

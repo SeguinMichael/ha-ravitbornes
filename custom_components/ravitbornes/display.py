@@ -15,8 +15,20 @@ _STOPWORDS = {"de", "des", "du", "d", "la", "le", "les", "l", "et", "of", "the",
 
 # Free-form sensor states cannot use Home Assistant translations.
 _WORDS = {
-    "en": {"free": "free", "free_one": "free", "full": "full", "unknown": "availability ?"},
-    "fr": {"free": "libres", "free_one": "libre", "full": "complet", "unknown": "dispo ?"},
+    "en": {
+        "free": "free",
+        "free_one": "free",
+        "full": "full",
+        "unknown": "availability ?",
+        "no_charge": "no charge",
+    },
+    "fr": {
+        "free": "libres",
+        "free_one": "libre",
+        "full": "complet",
+        "unknown": "dispo ?",
+        "no_charge": "gratuit",
+    },
 }
 
 
@@ -70,14 +82,25 @@ def format_station(item: RankedStation, language: str) -> str:
         and item.free_power_kw < item.power_kw
     ):
         free_power = _number(item.free_power_kw, lang)
-        return (
+        text = (
             f"{name} · {free_power} kW {words['free_one']} (max {power}) · "
             f"{distance} km · {item.available}/{item.total}"
         )
-    if item.status is AvailabilityStatus.AVAILABLE:
-        availability = f"{item.available}/{item.total} {words['free']}"
-    elif item.status is AvailabilityStatus.UNAVAILABLE:
-        availability = words["full"]
     else:
-        availability = words["unknown"]
-    return f"{name} · {power} kW · {distance} km · {availability}"
+        if item.status is AvailabilityStatus.AVAILABLE:
+            availability = f"{item.available}/{item.total} {words['free']}"
+        elif item.status is AvailabilityStatus.UNAVAILABLE:
+            availability = words["full"]
+        else:
+            availability = words["unknown"]
+        text = f"{name} · {power} kW · {distance} km · {availability}"
+    return text + _price(item.price_per_kwh, lang)
+
+
+def _price(price_per_kwh: float | None, lang: str) -> str:
+    """' · 0,29 €/kWh', ' · gratuit', or nothing when unknown."""
+    if price_per_kwh is None:
+        return ""
+    if price_per_kwh == 0:
+        return f" · {_WORDS[lang]['no_charge']}"
+    return f" · {_number(round(price_per_kwh, 2), lang)} €/kWh"

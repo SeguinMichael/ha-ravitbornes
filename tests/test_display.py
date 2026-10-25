@@ -94,3 +94,14 @@ def test_best_power_free_keeps_the_short_form() -> None:
     )
 
     assert format_station(item, "fr") == "Example Fast Charge · 350 kW · 0,1 km · 2/5 libres"
+
+
+def test_price_is_appended_when_known() -> None:
+    """IRVE price at the end of the row; nothing when unknown."""
+    item = _ranked(AvailabilityStatus.AVAILABLE, available=3, total=6)
+
+    assert format_station(replace(item, price_per_kwh=0.29), "fr").endswith("3/6 libres · 0,29 €/kWh")
+    assert format_station(replace(item, price_per_kwh=0.5), "en").endswith("3/6 free · 0.5 €/kWh")
+    assert format_station(replace(item, price_per_kwh=0.0), "fr").endswith(" · gratuit")
+    assert format_station(replace(item, price_per_kwh=0.0), "en").endswith(" · no charge")
+    assert "€" not in format_station(item, "fr")

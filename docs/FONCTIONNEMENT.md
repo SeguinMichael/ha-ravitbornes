@@ -4,7 +4,7 @@
 
 ## État au 2026-10-25
 
-Chaîne complète en place, **jamais testée dans une vraie installation HA ni dans une voiture** : position de la voiture → recherche TomTom → disponibilité → 6 capteurs « Borne N » et 6 boutons « Masquer la borne N ».
+Chaîne complète en place, **jamais testée dans une vraie installation HA ni dans une voiture** : position de la voiture → recherche TomTom → disponibilité → tarif IRVE (France) → 6 capteurs « Borne N » et 6 boutons « Masquer la borne N ».
 
 ### Configuration (`config_flow.py`)
 
@@ -24,14 +24,15 @@ Chaîne complète en place, **jamais testée dans une vraie installation HA ni d
 - **Liste des bornes** : recherche autour de la position **arrondie** (~1 km), rayon = rayon du profil + 1 km, 50 résultats au plus, **filtrée par TomTom** sur les connecteurs du véhicule (`connectorSet`) et la puissance minimale du profil (`minPowerKW`, autoroute : 50 kW), doublons fusionnés ; gardée en mémoire **6 h** par (zone, profil, connecteurs).
 - **Disponibilité** : demandée seulement pour les bornes affichées (tri par distance, donc connu avant), gardée **3 min** par borne.
 - **Erreurs** : quota atteint ou réseau pendant les appels de disponibilité → on garde ce qu'on a, les bornes restantes passent en « inconnu » (avertissement dans le journal) ; clé refusée ou recherche impossible → capteurs indisponibles (au démarrage : nouvelle tentative plus tard).
+- **Tarifs** (`irve.py`) : pour chaque borne affichée **située en France** (`countryCode` TomTom), une requête à l'API tabulaire data.gouv.fr du fichier consolidé IRVE, sur une boîte d'environ ±33 m × ±40 m **centrée sur la borne** (jamais sur la voiture), sans clé. Les lignes (une par point de charge) sont regroupées par station ; la station IRVE retenue est la plus proche à **30 m** au plus. Prix lu dans le texte libre `tarification` (premier « x €/kWh », virgule ou point, « euros par kWh » accepté ; prix à la minute ou à la session ignorés) ; `gratuit` → 0. Prix du point de charge dont la puissance est la plus proche de celle affichée. Résultat (prix ou absence de station) gardé **24 h** par borne ; en cas d'échec IRVE (HTTP, délai de 10 s, réponse illisible), la borne s'affiche sans prix et rien n'est mis en cache.
 - Caches en mémoire uniquement, perdus au redémarrage.
 
 ### Capteurs (`sensor.py`, `display.py`)
 
 - 6 capteurs « Borne 1 » à « Borne 6 » (`sensor.ravitbornes_station_N`), rattachés à un appareil de service « RavitBornes ». Inconnus s'il y a moins de bornes.
 - **Nom** : « Réseau (rue) », réseau long remplacé par son sigle (ex. `SDESM (Place Notre Dame)`).
-- **État** : texte court dans la langue de HA (fr ou en), ex. `IONITY (Aire X) · 150 kW · 1,2 km · 3/6 libres` ; si seules des prises plus lentes sont libres, `Ionity · 50 kW libre (max 350) · 0,1 km · 1/5` ; `… · complet` (aucune prise compatible libre : forme texte de la ligne grisée), `… · dispo ?` (pas de donnée).
-- **Attributs** : `latitude` / `longitude` **de la borne** (pour la navigation depuis Android Auto), `station` (nom complet), `street`, `distance_km`, `power_kw`, `free_power_kw` (meilleure prise compatible libre), `available`, `total`, `status`.
+- **État** : texte court dans la langue de HA (fr ou en), ex. `IONITY (Aire X) · 150 kW · 1,2 km · 3/6 libres` ; si seules des prises plus lentes sont libres, `Ionity · 50 kW libre (max 350) · 0,1 km · 1/5` ; `… · complet` (aucune prise compatible libre : forme texte de la ligne grisée), `… · dispo ?` (pas de donnée). Tarif ajouté en fin de ligne quand il est lisible : `… · 0,29 €/kWh` ou `… · gratuit`.
+- **Attributs** : `latitude` / `longitude` **de la borne** (pour la navigation depuis Android Auto), `station` (nom complet), `street`, `distance_km`, `power_kw`, `free_power_kw` (meilleure prise compatible libre), `price_per_kwh` (IRVE, approximatif ; 0 = gratuit ; vide si inconnu), `available`, `total`, `status`.
 
 ### Boutons et bornes masquées (`button.py`, `exclusions.py`)
 
@@ -61,7 +62,9 @@ Chaîne complète en place, **jamais testée dans une vraie installation HA ni d
 - `tests/fixtures/` : réponses TomTom réelles, structure conservée, contenu anonymisé.
 - `test_sensor.py` (bout en bout) : bornes les plus proches et leurs états, petit déplacement ignoré, cache réutilisé, nouvelle zone, rien à la maison, quota partiel, clé refusée au démarrage.
 - `tests/fixtures/nearby_search_dc.json`, `charging_availability_dc.json` : hub DC réel d'aire d'autoroute, anonymisé (2026-10-25).
+- `tests/fixtures/irve_tabular.json` : réponse réelle de l'API tabulaire IRVE (toutes les colonnes conservées), opérateurs, identifiants, adresses et positions remplacés (2026-10-25).
+- `test_irve.py` : lecture du prix (variantes, prix non €/kWh ignorés), regroupement par station, gratuit, puissance la plus proche, rapprochement à 30 m, cache 24 h, pas de requête hors France, échec IRVE sans effet sur la borne ; bout en bout : prix affiché et **requête centrée sur la borne, pas sur la voiture**.
 - `test_scoring.py`, `test_models.py`, `test_api.py` (dont **absence de la clé** dans logs et erreurs), `test_cache.py`, `test_display.py`, `test_diagnostics.py` (**ni clé, ni entité, ni coordonnées**), `test_config_flow.py` (deux étapes, erreurs, options), `test_init.py`.
 - `test_manual_search.py` : pas de minuterie sans entité de trajet (non-régression), bouton à la maison et hors trajet, sans entité de trajet, effacement immédiat à l'échéance, relance de la fenêtre, fin de trajet pendant la fenêtre.
 - `test_trip_and_exclusions.py` : rafraîchissement toutes les 3 min pendant le trajet et arrêt ensuite, déplacements ignorés hors trajet, source de position la plus récente, bouton « Masquer » (persistance, rechargement, aucun appel TomTom), reconnaissance par position, emplacement vide, démasquage dans les options.
-- Contrôle de pertinence : désactiver le seuil de 200 m, le cache de disponibilité, l'exception « maison », la dégradation sur quota (2026-10-24), la minuterie de trajet, l'entité de trajet, le choix par fraîcheur, le filtrage des bornes masquées la reconnaissance par position, la dérogation « maison » du bouton, la relance de la fenêtre, l'effacement à l'échéance ou la minuterie sans entité de trajet (2026-10-25) fait échouer au moins un test.
+- Contrôle de pertinence : désactiver le seuil de 200 m, le cache de disponibilité, l'exception « maison », la dégradation sur quota (2026-10-24), la minuterie de trajet, l'entité de trajet, le choix par fraîcheur, le filtrage des bornes masquées la reconnaissance par position, la dérogation « maison » du bouton, la relance de la fenêtre, l'effacement à l'échéance ou la minuterie sans entité de trajet (2026-10-25), et pour les tarifs le centrage sur la borne, le filtre France, `gratuit`, la tolérance de 30 m, le choix de la puissance, la durée de 24 h, l'affichage « gratuit » ou le branchement dans le coordinateur fait échouer au moins un test.
