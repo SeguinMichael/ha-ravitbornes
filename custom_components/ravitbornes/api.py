@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Collection
 import logging
 import time
 from typing import Any
@@ -49,20 +50,33 @@ class TomTomClient:
         self._api_key = api_key
 
     async def nearby_stations(
-        self, latitude: float, longitude: float, radius_m: int, limit: int = 20
+        self,
+        latitude: float,
+        longitude: float,
+        radius_m: int,
+        limit: int = 20,
+        connector_types: Collection[str] = (),
+        min_power_kw: float = 0.0,
     ) -> list[Station]:
-        """Return charging stations within radius_m of a (rounded) position."""
+        """Return charging stations within radius_m of a (rounded) position.
+
+        Connector and power filters are applied by TomTom, so that the result
+        limit is spent on usable stations only (in a city, the nearest 50 are
+        mostly slow AC chargers).
+        """
         lat, lon = round_position(latitude, longitude)
-        payload = await self._get(
-            "nearbySearch/.json",
-            {
-                "lat": lat,
-                "lon": lon,
-                "radius": radius_m,
-                "limit": limit,
-                "categorySet": EV_STATION_CATEGORY,
-            },
-        )
+        params: dict[str, Any] = {
+            "lat": lat,
+            "lon": lon,
+            "radius": radius_m,
+            "limit": limit,
+            "categorySet": EV_STATION_CATEGORY,
+        }
+        if connector_types:
+            params["connectorSet"] = ",".join(sorted(connector_types))
+        if min_power_kw > 0:
+            params["minPowerKW"] = min_power_kw
+        payload = await self._get("nearbySearch/.json", params)
         return parse_stations(payload)
 
     async def charging_availability(

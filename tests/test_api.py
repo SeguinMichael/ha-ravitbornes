@@ -113,3 +113,36 @@ async def test_timeout_is_a_connection_error(
 
     with pytest.raises(TomTomConnectionError):
         await client.validate_key()
+
+
+async def test_connector_and_power_filters_are_sent_to_tomtom(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+) -> None:
+    """TomTom filters server-side, so the result limit is spent on usable stations."""
+    aioclient_mock.get(NEARBY_URL, json=load_json_fixture("nearby_search.json"))
+    client = TomTomClient(async_get_clientsession(hass), API_KEY)
+
+    await client.nearby_stations(
+        45.1,
+        4.2,
+        radius_m=6000,
+        connector_types={"IEC62196Type2CCS", "Chademo"},
+        min_power_kw=50.0,
+    )
+
+    _, url, _, _ = aioclient_mock.mock_calls[0]
+    assert url.query["connectorSet"] == "Chademo,IEC62196Type2CCS"
+    assert url.query["minPowerKW"] == "50.0"
+
+
+async def test_no_power_filter_when_profile_has_no_floor(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+) -> None:
+    aioclient_mock.get(NEARBY_URL, json=load_json_fixture("nearby_search.json"))
+    client = TomTomClient(async_get_clientsession(hass), API_KEY)
+
+    await client.nearby_stations(45.1, 4.2, radius_m=3000, connector_types={"IEC62196Type2Outlet"})
+
+    _, url, _, _ = aioclient_mock.mock_calls[0]
+    assert url.query["connectorSet"] == "IEC62196Type2Outlet"
+    assert "minPowerKW" not in url.query

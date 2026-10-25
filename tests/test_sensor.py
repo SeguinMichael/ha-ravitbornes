@@ -96,8 +96,12 @@ async def test_sensors_show_nearest_stations(
     assert second.attributes["status"] == "unavailable"
 
     assert hass.states.get(STATION_3).state == STATE_UNKNOWN
-    # One search; availability only for the two shown stations (the DC one is filtered out).
+    # One search, filtered by TomTom for the car's connectors (visit: no power floor).
     assert _calls(aioclient_mock, "nearbySearch/.json") == 1
+    search_url = next(c[1] for c in aioclient_mock.mock_calls if c[1].path.endswith("nearbySearch/.json"))
+    assert search_url.query["connectorSet"] == "IEC62196Type2Outlet"
+    assert "minPowerKW" not in search_url.query
+    # Availability only for the two shown stations (the DC one is filtered out).
     assert _calls(aioclient_mock, "chargingAvailability.json") == 2
     await _unload(hass, entry)
 

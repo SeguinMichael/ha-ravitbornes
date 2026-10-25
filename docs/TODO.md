@@ -11,7 +11,10 @@
 - **Durcissement CI** : épingler les actions GitHub par SHA plutôt que par tag ; activer côté GitHub le *secret scanning* et la *push protection* (gratuits sur dépôt public).
 
 - **Ré-authentification** : si TomTom refuse la clé en cours d'usage, les capteurs deviennent indisponibles sans proposer de ressaisir la clé (flux `reauth` à ajouter).
-- **Zones denses** : 50 résultats de recherche peuvent ne pas couvrir tout le rayon ; à mesurer (spike Q2).
+- **Zones denses** : atténué par le filtrage côté TomTom (connecteurs, puissance) ; en profil visite (AC, sans plancher), 50 résultats peuvent encore ne pas couvrir tout le rayon.
+- **Doublons à deux identifiants de disponibilité** (même opérateur, ~10 m, connecteurs différents) : un seul site listé deux fois, ou deux bornes distinctes ? Selon la réponse, fusionner en additionnant les disponibilités ou garder les deux lignes. Aujourd'hui, la seconde disponibilité est perdue.
+- **Noms de borne** (proposition 2026-10-25, en attente de validation) : afficher la rue et l'opérateur abrégé, ex. `Place Notre-Dame (SDESM)`, car beaucoup de bornes publiques partagent un même nom long d'opérateur.
+- **Tarifs** : aucune API tarifaire dans l'offre libre-service TomTom constatée à ce jour (la notion n'apparaît que dans l'offre automobile sous contrat) ; l'« EV Search API » n'est pas dans le périmètre de la clé d'évaluation, son contenu n'a pas été vérifié.
 
 ## Évolutions envisagées
 

@@ -56,6 +56,15 @@ TomTom peut-il être la source principale de disponibilité temps réel, en usag
 - **Défaut d'affichage révélé** : CCS 350 kW tous occupés ou inconnus, seul le CCS 50 kW libre → l'affichage annonçait « 350 kW · 1/5 libres ». Corrigé (décision utilisateur 2026-10-25) : puissance de la meilleure prise libre en tête, « 50 kW libre (max 350) · … · 1/5 ».
 - Couverture des aires : **2 aires vérifiées sur le terrain, 2 concordances** (une sans borne, une avec un hub DC trouvé). Encourageant, mais échantillon trop petit pour conclure : tester d'autres aires, dont une avec **plusieurs réseaux**, pour vérifier qu'ils remontent tous.
 
+### Q2 — ville moyenne, filtres côté TomTom (2026-10-25)
+
+- Sans filtre (rayon 3 km, limite 10) : 50 bornes au total ; les 10 plus proches sont surtout de l'AC 22 kW et des DC 24-25 kW ; **une seule** borne utile en profil autoroute. Avec la limite de 50 du coordinateur, une borne rapide plus lointaine pouvait être **écartée sans le savoir**.
+- **`connectorSet` et `minPowerKW` sont bien appliqués par TomTom** (rayon 6 km, CCS, ≥ 50 kW) : 18 résultats, tous avec du CCS ≥ 100 kW ; les DC 25 kW disparaissent. Implémenté.
+- **Plusieurs réseaux remontent** dans une même zone : ChargePoint, Electra, Fastned, Izivia, TotalEnergies, syndicat départemental. Aucun Tesla vu (présence locale non vérifiée).
+- 9 résultats sur 10 avec identifiant de disponibilité (sans filtre).
+- **Doublons ambigus** : deux entrées du même opérateur à ~10 m, **chacune avec son identifiant de disponibilité** et des connecteurs différents → le dédoublonnage en garde une, la disponibilité de l'autre est perdue. Voir TODO.
+- **Noms peu lisibles** : 6 bornes sur 10 portent le même nom long d'opérateur public (tronqué, identique d'une ligne à l'autre). Voir TODO.
+
 ## Reste à faire
 
 Q2 (couverture des aires, DC, EVzen), Q3, Q4 mesuré, Q5, Q6.

@@ -21,7 +21,7 @@ Chaîne complète en place, **jamais testée dans une vraie installation HA ni d
 - **Recherche manuelle** (bouton « Rechercher des bornes (30 min) ») : recherche immédiate puis toutes les 3 min pendant 30 min, hors trajet et à la maison compris ; un nouvel appui relance les 30 min ; à l'échéance, liste vidée aussitôt sauf trajet en cours.
 - **À la maison** (état `home` de la source retenue) ou position inconnue : aucun appel hors recherche manuelle ; la liste est vidée en rentrant.
 - Les **bornes masquées** sont retirées avant le classement.
-- **Liste des bornes** : recherche autour de la position **arrondie** (~1 km), rayon = rayon du profil + 1 km, 50 résultats au plus, doublons fusionnés ; gardée en mémoire **6 h** par (zone, profil).
+- **Liste des bornes** : recherche autour de la position **arrondie** (~1 km), rayon = rayon du profil + 1 km, 50 résultats au plus, **filtrée par TomTom** sur les connecteurs du véhicule (`connectorSet`) et la puissance minimale du profil (`minPowerKW`, autoroute : 50 kW), doublons fusionnés ; gardée en mémoire **6 h** par (zone, profil, connecteurs).
 - **Disponibilité** : demandée seulement pour les bornes affichées (tri par distance, donc connu avant), gardée **3 min** par borne.
 - **Erreurs** : quota atteint ou réseau pendant les appels de disponibilité → on garde ce qu'on a, les bornes restantes passent en « inconnu » (avertissement dans le journal) ; clé refusée ou recherche impossible → capteurs indisponibles (au démarrage : nouvelle tentative plus tard).
 - Caches en mémoire uniquement, perdus au redémarrage.

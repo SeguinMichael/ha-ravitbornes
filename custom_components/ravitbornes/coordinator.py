@@ -255,7 +255,7 @@ class RavitBornesCoordinator(DataUpdateCoordinator[list[RankedStation]]):
         connector_types = {CONNECTORS[key] for key in options[CONF_CONNECTORS]}
 
         try:
-            stations = await self._stations_around(position, profile)
+            stations = await self._stations_around(position, profile, connector_types)
         except TomTomError as err:
             raise UpdateFailed(str(err)) from err
         stations = [s for s in stations if not self.exclusions.is_excluded(s)]
@@ -267,11 +267,14 @@ class RavitBornesCoordinator(DataUpdateCoordinator[list[RankedStation]]):
         return rank_stations(stations, availability, *position, connector_types, profile)
 
     async def _stations_around(
-        self, position: tuple[float, float], profile: ChargingProfile
+        self,
+        position: tuple[float, float],
+        profile: ChargingProfile,
+        connector_types: set[str],
     ) -> list[Station]:
-        """Stations around the rounded zone, kept for the duration of a trip."""
+        """Usable stations around the rounded zone, kept for the duration of a trip."""
         zone = round_position(*position)
-        key = (zone, profile.key)
+        key = (zone, profile.key, frozenset(connector_types))
         stations = self._stations.get(key)
         if stations is None:
             stations = dedupe_stations(
@@ -279,6 +282,8 @@ class RavitBornesCoordinator(DataUpdateCoordinator[list[RankedStation]]):
                     *zone,
                     radius_m=int(profile.max_distance_m) + SEARCH_MARGIN_M,
                     limit=SEARCH_LIMIT,
+                    connector_types=connector_types,
+                    min_power_kw=profile.min_power_kw,
                 )
             )
             self._stations.set(key, stations)
