@@ -46,9 +46,16 @@ TomTom peut-il être la source principale de disponibilité temps réel, en usag
 - Le quota Search n'est consommé qu'au chargement du corridor ; la contrainte de coût porte sur le quota (inconnu) de l'API de disponibilité.
 - Ordre de grandeur (**estimation, non mesurée**) : ~10 appels de disponibilité par rafraîchissement, toutes les 3 min sur 1 h ≈ 200 appels/h avant déduplication par le TTL.
 
+### Q2 — couverture autoroute : premier essai (2026-10-25), à compléter
+
+- `nearbySearch` (rayon 3 km, limite 5) centré sur une **aire d'autoroute** d'un trajet habituel (deux aires face à face) : **un seul résultat**, une borne **AC** de village à 1,1 km (2 × Type 2 22 kW + 2 prises domestiques). **Aucune borne sur les aires elles-mêmes.**
+- Deux lectures possibles : pas de borne rapide sur ces aires, ou **trou de couverture TomTom**. À trancher par une source indépendante (vérification manuelle dans Chargemap, sans extraction).
+- `chargingAvailability` sur cette borne : OK ; libellés de connecteur et puissances **identiques** entre recherche et disponibilité (`StandardHouseholdCountrySpecific` 3 kW, `IEC62196Type2Outlet` 22 kW). Le code (`parse_stations`, `parse_availability`, `rank_stations`) donne sur ces réponses réelles : 22 kW, 1,1 km, 2/2 libres, prise domestique non comptée pour une voiture Type 2.
+- Toujours **aucun échantillon DC** : la correspondance des libellés DC (CCS, CHAdeMO) reste à vérifier sur une vraie réponse.
+
 ## Reste à faire
 
-Q2 (DC et EVzen), Q3, Q4 mesuré, Q5, Q6.
+Q2 (couverture des aires, DC, EVzen), Q3, Q4 mesuré, Q5, Q6.
 
 ## Livrable
 
